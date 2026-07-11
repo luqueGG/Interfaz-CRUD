@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: postgres:16
+    container_name: solidtoxic-db
+    environment:
+      POSTGRES_DB: solidtoxic
+      POSTGRES_USER: solidtoxic_user
+      POSTGRES_PASSWORD: solidtoxic_pass
+    volumes:
+      - ./db/postresiduos.sql:/docker-entrypoint-initdb.d/postresiduos.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U solidtoxic_user -d solidtoxic"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: solidtoxic-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/solidtoxic
+      DB_USERNAME: solidtoxic_user
+      DB_PASSWORD: solidtoxic_pass
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
