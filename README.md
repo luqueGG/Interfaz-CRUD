@@ -21,19 +21,26 @@
 - Docker instalado
 - JDK java
 - Maven
+
 El resto se carga en los contenedores y/o cargados en Maven de 
 forma automatica
 
 ## Features
 
-## Instrucciones
+## Instrucciones para Windows (para MAC no se xd, prueba)
 
-Primero se levantan los contenedores (para el backend y la base de datos)
+Clona el repositorio (via HTTPS)
+```
+git clone https://github.com/luqueGG/Interfaz-CRUD.git
+```
+
+Luego levanta los contenedores (para el backend y la base de datos)
+para esto debes tener corriendo Docker
 ```
 docker compose up --build
 ```
 
 Luego en otra terminal, se compila y ejecuta la seccion gui
 ```
-mvn:javafx:run
+mvn javafx:run
 ```
