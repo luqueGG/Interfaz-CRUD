@@ -134,3 +134,79 @@ CREATE TABLE Traslado_Transportista (
     FOREIGN KEY (NIF_Transportista) REFERENCES Empresa_Transportista(NIF_Transportista),
     FOREIGN KEY (ID_Tipo_Transporte) REFERENCES TR_Tipo_Transporte(ID_Tipo_Transporte)
 );
+
+-- INSERCION DE DATOS DE PRUEBA
+
+INSERT INTO TR_Nivel_Toxicidad VALUES
+(1, 'Bajo', 'Residuo de baja peligrosidad', 'A'),
+(2, 'Medio', 'Residuo de peligrosidad media', 'A'),
+(3, 'Alto', 'Residuo altamente peligroso', 'A');
+
+INSERT INTO TR_Tipo_Envase VALUES
+(1, 'Tambor Metálico', 'Tambor de acero de 200L', 'A'),
+(2, 'Contenedor Plástico', 'Contenedor HDPE', 'A'),
+(3, 'Big Bag', 'Bolsa industrial', 'A');
+
+INSERT INTO TR_Tipo_Tratamiento VALUES
+(1, 'Reciclaje', 'Proceso de reciclaje', 'A'),
+(2, 'Incineración', 'Destrucción térmica', 'A'),
+(3, 'Neutralización', 'Tratamiento químico', 'A');
+
+INSERT INTO TR_Tipo_Transporte VALUES
+(1, 'Camión', 'Transporte terrestre', 'A'),
+(2, 'Ferrocarril', 'Transporte ferroviario', 'A'),
+(3, 'Barco', 'Transporte marítimo', 'A');
+
+INSERT INTO Residuo_Estandarizado VALUES
+(101, 'Aceite Usado', 'A'),
+(102, 'Baterías de Plomo', 'A'),
+(103, 'Solventes Orgánicos', 'A');
+
+INSERT INTO Constituyente VALUES
+('PB', 'Plomo', 'Metal pesado', 'A'),
+('HG', 'Mercurio', 'Metal pesado', 'A'),
+('BEN', 'Benceno', 'Compuesto orgánico', 'A'),
+('ACE', 'Acetona', 'Solvente', 'A');
+
+INSERT INTO Region VALUES
+(1, 'Lima', 'A'),
+(2, 'Arequipa', 'A'),
+(3, 'La Libertad', 'A');
+
+
+INSERT INTO Empresa_Productora VALUES
+('20111111111', 'Química Andina SAC', 'Lima', 'Industria Química', NULL, 'A'),
+('20222222222', 'Metalúrgica Sur SAC', 'Arequipa', 'Metalurgia', NULL, 'A');
+
+INSERT INTO Empresa_Transportista VALUES
+('20666666661', 'Transportes Eco SAC', 'Lima', NULL, 'A'),
+('20666666662', 'Logística Ambiental SAC', 'Arequipa', NULL, 'A');
+
+INSERT INTO Destino VALUES
+('DST001', 1, 'Planta Lima Norte', 'Lima', 10000.00, 4200.00, NULL, 'A'),
+('DST002', 2, 'Centro Ambiental Sur', 'Arequipa', 15000.00, 8700.00, NULL, 'A');
+
+INSERT INTO Residuo VALUES
+('RES001', '20111111111', 101, 2, 1200.00, 'Aceite de maquinaria', 'A'),
+('RES002', '20222222222', 102, 3, 450.00, 'Baterías industriales', 'A'),
+('RES003', '20111111111', 103, 3, 800.00, 'Solventes contaminados', 'A');
+
+
+INSERT INTO Residuo_Constituyente VALUES
+('RES001', 'ACE', 900.00, 'A'),
+('RES002', 'PB', 350.00, 'A'),
+('RES002', 'HG', 15.00, 'A'),
+('RES003', 'BEN', 500.00, 'A'),
+('RES003', 'ACE', 250.00, 'A');
+
+
+
+INSERT INTO Traslado VALUES
+(1, 'RES001', 'DST001', '2026-07-01', 600.00, 1, 1, '2026-07-02', NULL, 'A'),
+(2, 'RES002', 'DST002', '2026-07-03', 450.00, 2, 2, '2026-07-05', NULL, 'A'),
+(3, 'RES003', 'DST001', '2026-07-04', 300.00, 3, 3, '2026-07-06', NULL, 'A');
+
+INSERT INTO Traslado_Transportista VALUES
+(1, '20666666661', 1, 35.5, 450.00, 'A'),
+(2, '20666666662', 1, 980.0, 3500.00, 'A'),
+(3, '20666666661', 2, 120.0, 1200.00, 'A');
