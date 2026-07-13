@@ -42,5 +42,6 @@ docker compose up --build
 
 Luego en otra terminal, se compila y ejecuta la seccion gui
 ```
+cd gui
 mvn javafx:run
 ```
