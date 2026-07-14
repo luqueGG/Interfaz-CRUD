@@ -8,14 +8,14 @@ import java.util.Map;
 public class ResiduoPanel extends MaintenancePanel {
 
     public ResiduoPanel() {
-        super("Hazardous Waste — Residuo", List.of(
+        super("Residuos Peligrosos — Residuo", List.of(
                 FieldDescriptor.pk("codResiduo", "Cod_Residuo", 20),
                 FieldDescriptor.fk("nifEmpresa", "Empresa Productora", "productora", "nifEmpresa", "nombreEmpresa"),
                 FieldDescriptor.fk("codEstandar", "Residuo Estandarizado", "estandar", "codEstandar", "nombreEstandar"),
                 FieldDescriptor.fk("idToxicidad", "Nivel Toxicidad", "toxicidad", "idToxicidad", "nivel"),
                 new FieldDescriptor("cantidadTotal", "Cantidad_Total", 15),
                 FieldDescriptor.large("otrosDatos", "Otros_Datos"),
-                new FieldDescriptor("estReg", "State", 1)
+                new FieldDescriptor("estReg", "Estado", 1)
         ));
     }
 

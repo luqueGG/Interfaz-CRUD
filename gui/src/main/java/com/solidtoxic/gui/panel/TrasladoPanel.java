@@ -8,7 +8,7 @@ import java.util.Map;
 public class TrasladoPanel extends MaintenancePanel {
 
     public TrasladoPanel() {
-        super("Shipments — Traslado", List.of(
+        super("Traslados — Traslado", List.of(
                 FieldDescriptor.pk("idTraslado", "ID_Traslado", 10),
                 FieldDescriptor.fk("codResiduo", "Residuo", "residuo", "codResiduo", "codResiduo"),
                 FieldDescriptor.fk("codDestino", "Destino", "destino", "codDestino", "nombreDestino"),
@@ -18,7 +18,7 @@ public class TrasladoPanel extends MaintenancePanel {
                 FieldDescriptor.fk("idTratamiento", "Tipo Tratamiento", "tratamiento", "idTratamiento", "nombreTratamiento"),
                 new FieldDescriptor("fechaLlegada", "Fecha_Llegada (YYYY-MM-DD)", 10),
                 FieldDescriptor.large("otrosDatos", "Otros_Datos"),
-                new FieldDescriptor("estReg", "State", 1)
+                new FieldDescriptor("estReg", "Estado", 1)
         ));
     }
 

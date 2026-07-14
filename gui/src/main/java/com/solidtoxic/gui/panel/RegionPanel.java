@@ -8,10 +8,10 @@ import java.util.Map;
 public class RegionPanel extends MaintenancePanel {
 
     public RegionPanel() {
-        super("Regions — Region", List.of(
+        super("Regiones — Region", List.of(
                 FieldDescriptor.pk("idRegion", "ID_Region", 10),
                 new FieldDescriptor("nombreRegion", "Nombre_Region", 50),
-                new FieldDescriptor("estReg", "State", 1)
+                new FieldDescriptor("estReg", "Estado", 1)
         ));
     }
 

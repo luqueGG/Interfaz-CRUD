@@ -8,10 +8,10 @@ import java.util.Map;
 public class ResiduoEstandarizadoPanel extends MaintenancePanel {
 
     public ResiduoEstandarizadoPanel() {
-        super("Standardised Waste — Residuo_Estandarizado", List.of(
+        super("Residuos Estandarizados — Residuo_Estandarizado", List.of(
                 FieldDescriptor.pk("codEstandar", "Cod_Estandar", 10),
                 new FieldDescriptor("nombreEstandar", "Nombre_Estandar", 100),
-                new FieldDescriptor("estReg", "State", 1)
+                new FieldDescriptor("estReg", "Estado", 1)
         ));
     }
 

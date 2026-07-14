@@ -44,22 +44,22 @@ public class MainWindow extends BorderPane {
 
     private void registerPanels() {
         // Reference tables
-        panelRegistry.put("Toxicity Levels",        NivelToxicidadPanel::new);
-        panelRegistry.put("Packaging Types",         TipoEnvasePanel::new);
-        panelRegistry.put("Treatment Types",         TipoTratamientoPanel::new);
-        panelRegistry.put("Transport Types",         TipoTransportePanel::new);
-        panelRegistry.put("Standardised Waste",      ResiduoEstandarizadoPanel::new);
-        panelRegistry.put("Constituents",            ConstituyentePanel::new);
-        panelRegistry.put("Regions",                 RegionPanel::new);
+        panelRegistry.put("Niveles de Toxicidad",    NivelToxicidadPanel::new);
+        panelRegistry.put("Tipos de Envase",          TipoEnvasePanel::new);
+        panelRegistry.put("Tipos de Tratamiento",     TipoTratamientoPanel::new);
+        panelRegistry.put("Tipos de Transporte",      TipoTransportePanel::new);
+        panelRegistry.put("Residuos Estandarizados",  ResiduoEstandarizadoPanel::new);
+        panelRegistry.put("Constituyentes",           ConstituyentePanel::new);
+        panelRegistry.put("Regiones",                 RegionPanel::new);
         // Master tables
-        panelRegistry.put("Producer Companies",      EmpresaProductoraPanel::new);
-        panelRegistry.put("Transport Companies",     EmpresaTransportistaPanel::new);
-        panelRegistry.put("Destinations",            DestinoPanel::new);
-        panelRegistry.put("Waste Records",           ResiduoPanel::new);
+        panelRegistry.put("Empresas Productoras",     EmpresaProductoraPanel::new);
+        panelRegistry.put("Empresas Transportistas",  EmpresaTransportistaPanel::new);
+        panelRegistry.put("Destinos",                 DestinoPanel::new);
+        panelRegistry.put("Residuos",                 ResiduoPanel::new);
         // Transactional / associative
-        panelRegistry.put("Waste Composition",       ResiduoConstituyentePanel::new);
-        panelRegistry.put("Shipments",               TrasladoPanel::new);
-        panelRegistry.put("Shipment Carriers",       TrasladoTransportistaPanel::new);
+        panelRegistry.put("Composición de Residuos",  ResiduoConstituyentePanel::new);
+        panelRegistry.put("Traslados",                TrasladoPanel::new);
+        panelRegistry.put("Transportistas de Traslado", TrasladoTransportistaPanel::new);
     }
 
     // ── Menu bar ──────────────────────────────────────────────────────────────
@@ -67,9 +67,9 @@ public class MainWindow extends BorderPane {
     private MenuBar buildMenuBar() {
         MenuBar bar = new MenuBar();
 
-        Menu refMenu    = new Menu("Reference Tables");
-        Menu masterMenu = new Menu("Master Tables");
-        Menu txMenu     = new Menu("Transactional");
+        Menu refMenu    = new Menu("Tablas de Referencia");
+        Menu masterMenu = new Menu("Tablas Maestras");
+        Menu txMenu     = new Menu("Transaccional");
         Menu repMenu    = new Menu("Reportes");
 
         for (Map.Entry<String, Supplier<Node>> entry : panelRegistry.entrySet()) {
@@ -77,11 +77,11 @@ public class MainWindow extends BorderPane {
             item.setOnAction(e -> switchPanel(entry.getValue()));
 
             String key = entry.getKey();
-            if (key.equals("Producer Companies") || key.equals("Transport Companies")
-                    || key.equals("Destinations") || key.equals("Waste Records")) {
+            if (key.equals("Empresas Productoras") || key.equals("Empresas Transportistas")
+                    || key.equals("Destinos") || key.equals("Residuos")) {
                 masterMenu.getItems().add(item);
-            } else if (key.equals("Waste Composition") || key.equals("Shipments")
-                    || key.equals("Shipment Carriers")) {
+            } else if (key.equals("Composición de Residuos") || key.equals("Traslados")
+                    || key.equals("Transportistas de Traslado")) {
                 txMenu.getItems().add(item);
             } else {
                 refMenu.getItems().add(item);
@@ -90,7 +90,7 @@ public class MainWindow extends BorderPane {
 
         // ── Reportes ──────────────────────────────────────────────────────────
         repMenu.getItems().addAll(
-                reportItem("Producer Companies",
+                reportItem("Empresas Productoras",
                         "/api/v1/productora",
                         List.of(
                                 new ColumnDef("nifEmpresa",     "NIF Empresa"),
@@ -100,7 +100,7 @@ public class MainWindow extends BorderPane {
                                 new ColumnDef("otrosDatos",     "Otros Datos"),
                                 new ColumnDef("estReg",         "Estado")
                         )),
-                reportItem("Transport Companies",
+                reportItem("Empresas Transportistas",
                         "/api/v1/transportista",
                         List.of(
                                 new ColumnDef("nifTransportista",    "NIF Transportista"),
@@ -109,7 +109,7 @@ public class MainWindow extends BorderPane {
                                 new ColumnDef("otrosDatos",          "Otros Datos"),
                                 new ColumnDef("estReg",              "Estado")
                         )),
-                reportItem("Destinations",
+                reportItem("Destinos",
                         "/api/v1/destino",
                         List.of(
                                 new ColumnDef("codDestino",       "Cod. Destino"),
@@ -121,7 +121,7 @@ public class MainWindow extends BorderPane {
                                 new ColumnDef("otrosDatos",       "Otros Datos"),
                                 new ColumnDef("estReg",           "Estado")
                         )),
-                reportItem("Waste Records",
+                reportItem("Residuos",
                         "/api/v1/residuo",
                         List.of(
                                 new ColumnDef("codResiduo",     "Cod. Residuo"),
@@ -152,7 +152,7 @@ public class MainWindow extends BorderPane {
     // ── Layout ────────────────────────────────────────────────────────────────
 
     private Node buildLayout() {
-        Label placeholder = new Label("Select a table from the menu to begin.");
+        Label placeholder = new Label("Selecciona una tabla del menú para comenzar.");
         placeholder.setStyle("-fx-font-size: 14; -fx-text-fill: #888;");
         contentArea.getChildren().add(placeholder);
         VBox.setVgrow(contentArea, Priority.ALWAYS);
@@ -173,20 +173,20 @@ public class MainWindow extends BorderPane {
         try {
             ApiResponse resp = ApiClient.getInstance().get("/api/v1/health");
             if (!resp.isSuccess()) {
-                disableAllPanelsWithMessage("Backend returned an unhealthy status. Maintenance operations are disabled.");
+                disableAllPanelsWithMessage("El backend respondió con un estado no saludable. Las operaciones de mantenimiento están deshabilitadas.");
             }
         } catch (BackendUnavailableException e) {
             disableAllPanelsWithMessage(
-                    "Cannot connect to the backend server.\n" +
-                    "Please ensure Docker containers are running and try again.\n\n" +
-                    "Details: " + e.getMessage());
+                    "No se pudo conectar con el servidor backend.\n" +
+                    "Verifica que los contenedores de Docker estén corriendo e inténtalo de nuevo.\n\n" +
+                    "Detalles: " + e.getMessage());
         }
     }
 
     private void disableAllPanelsWithMessage(String message) {
-        AlertUtil.showError("Backend Unreachable", message);
+        AlertUtil.showError("Backend No Disponible", message);
         // Replace content area with a persistent error notice
-        Label errorLabel = new Label("⚠ Backend unavailable — maintenance operations disabled.");
+        Label errorLabel = new Label("⚠ Backend no disponible — operaciones de mantenimiento deshabilitadas.");
         errorLabel.setStyle("-fx-font-size: 13; -fx-text-fill: #c00; -fx-padding: 20;");
         contentArea.getChildren().setAll(errorLabel);
         // Disable all menus in the menu bar

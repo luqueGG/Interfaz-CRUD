@@ -80,35 +80,35 @@ public class ReportService {
         try {
             ApiResponse resp = api.get(apiPath);
             if (!resp.isSuccess()) {
-                AlertUtil.showError("Report Error", "Failed to fetch data: " + resp.getBody());
+                AlertUtil.showError("Error de Reporte", "No se pudieron obtener los datos: " + resp.getBody());
                 return;
             }
             rows = api.getMapper().readValue(resp.getBody(), new TypeReference<>() {});
         } catch (BackendUnavailableException e) {
-            AlertUtil.showError("Connection Error", "Cannot reach backend: " + e.getMessage());
+            AlertUtil.showError("Error de Conexión", "No se pudo contactar al backend: " + e.getMessage());
             return;
         } catch (Exception e) {
-            AlertUtil.showError("Report Error", "Error reading data: " + e.getMessage());
+            AlertUtil.showError("Error de Reporte", "Error al leer los datos: " + e.getMessage());
             return;
         }
 
         // 2. Ask where to save
         FileChooser chooser = new FileChooser();
-        chooser.setTitle("Save Report as PDF");
+        chooser.setTitle("Guardar Reporte como PDF");
         chooser.setInitialFileName(sanitizeFilename(title) + "_"
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmm"))
                 + ".pdf");
         chooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("PDF Files", "*.pdf"));
+                new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf"));
         File target = chooser.showSaveDialog(owner);
         if (target == null) return; // user cancelled
 
         // 3. Build PDF
         try {
             buildPdf(target, title, columns, rows);
-            AlertUtil.showInfo("Report saved to:\n" + target.getAbsolutePath());
+            AlertUtil.showInfo("Reporte guardado en:\n" + target.getAbsolutePath());
         } catch (Exception e) {
-            AlertUtil.showError("PDF Error", "Could not write PDF: " + e.getMessage());
+            AlertUtil.showError("Error de PDF", "No se pudo escribir el PDF: " + e.getMessage());
         }
     }
 
@@ -139,7 +139,7 @@ public class ReportService {
             float topY = pageHeight - MARGIN;
             drawTitle(cs, title, pageWidth, topY);
 
-            String timestamp = "Generated: "
+            String timestamp = "Generado: "
                     + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
             drawSubtitle(cs, timestamp, MARGIN, topY - 16f);
 
@@ -279,9 +279,9 @@ public class ReportService {
                 };
                 textColor = COL_TEXT_LIGHT;
                 text = switch (text) {
-                    case "A" -> "Active";
-                    case "I" -> "Inactive";
-                    case "*" -> "Deleted";
+                    case "A" -> "Activo";
+                    case "I" -> "Inactivo";
+                    case "*" -> "Eliminado";
                     default  -> text;
                 };
             }

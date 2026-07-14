@@ -28,7 +28,7 @@ public class GridData extends StackPane {
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Empty state label (Req 2-5)
-        Label emptyLabel = new Label("No active records found.");
+        Label emptyLabel = new Label("No se encontraron registros activos.");
         emptyLabel.setStyle("-fx-text-fill: #888; -fx-font-style: italic;");
         tableView.setPlaceholder(emptyLabel);
 

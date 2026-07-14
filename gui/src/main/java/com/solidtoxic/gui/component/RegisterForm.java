@@ -37,16 +37,16 @@ public class RegisterForm extends VBox {
     private final Map<String, Control> fieldControls = new LinkedHashMap<>();
 
     // ── State badge ───────────────────────────────────────────────────────────
-    private final Label stateBadge = new Label("ACTIVE");
+    private final Label stateBadge = new Label("ACTIVO");
 
     // ── Buttons ───────────────────────────────────────────────────────────────
-    private final Button btnAdd        = new Button("Add");
-    private final Button btnModify     = new Button("Modify");
-    private final Button btnDelete     = new Button("Delete");
-    private final Button btnInactivate = new Button("Inactivate");
-    private final Button btnReactivate = new Button("Reactivate");
-    private final Button btnUpdate     = new Button("Update");
-    private final Button btnCancel     = new Button("Cancel");
+    private final Button btnAdd        = new Button("Agregar");
+    private final Button btnModify     = new Button("Modificar");
+    private final Button btnDelete     = new Button("Eliminar");
+    private final Button btnInactivate = new Button("Inactivar");
+    private final Button btnReactivate = new Button("Reactivar");
+    private final Button btnUpdate     = new Button("Actualizar");
+    private final Button btnCancel     = new Button("Cancelar");
 
     // ── Callbacks ─────────────────────────────────────────────────────────────
     private Consumer<Map<String, Object>> onAdd;
@@ -87,7 +87,7 @@ public class RegisterForm extends VBox {
     private HBox buildStateBadgeRow() {
         HBox row = new HBox(8);
         row.setAlignment(Pos.CENTER_LEFT);
-        row.getChildren().addAll(new Label("State:"), stateBadge);
+        row.getChildren().addAll(new Label("Estado:"), stateBadge);
         applyBadgeStyle("A");
         return row;
     }
@@ -179,14 +179,14 @@ public class RegisterForm extends VBox {
                 combo.setDisable(false);
             } else {
                 combo.setDisable(true);
-                AlertUtil.showWarning("Could not load options for \"" + fd.label() + "\" — field disabled.");
+                AlertUtil.showWarning("No se pudieron cargar las opciones para \"" + fd.label() + "\" — campo deshabilitado.");
             }
         } catch (BackendUnavailableException e) {
             combo.setDisable(true);
-            AlertUtil.showWarning("Backend unreachable: \"" + fd.label() + "\" ComboBox disabled.");
+            AlertUtil.showWarning("Backend no disponible: ComboBox de \"" + fd.label() + "\" deshabilitado.");
         } catch (Exception e) {
             combo.setDisable(true);
-            AlertUtil.showWarning("Error loading \"" + fd.label() + "\": " + e.getMessage());
+            AlertUtil.showWarning("Error al cargar \"" + fd.label() + "\": " + e.getMessage());
         }
     }
 
@@ -236,7 +236,7 @@ public class RegisterForm extends VBox {
         // Update — confirms pending operation (Req 5-1..4)
         btnUpdate.setOnAction(e -> {
             if (mode == OperationMode.IDLE) {
-                AlertUtil.showWarning("No pending operation to confirm.");
+                AlertUtil.showWarning("No hay ninguna operación pendiente por confirmar.");
                 return;
             }
             Map<String, Object> data = getData();
@@ -369,17 +369,17 @@ public class RegisterForm extends VBox {
     private void applyBadgeStyle(String estReg) {
         switch (estReg == null ? "" : estReg) {
             case "A" -> {
-                stateBadge.setText("ACTIVE");
+                stateBadge.setText("ACTIVO");
                 stateBadge.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; " +
                         "-fx-padding: 2 8 2 8; -fx-background-radius: 4;");
             }
             case "I" -> {
-                stateBadge.setText("INACTIVE");
+                stateBadge.setText("INACTIVO");
                 stateBadge.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; " +
                         "-fx-padding: 2 8 2 8; -fx-background-radius: 4;");
             }
             case "*" -> {
-                stateBadge.setText("DELETED");
+                stateBadge.setText("ELIMINADO");
                 stateBadge.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; " +
                         "-fx-padding: 2 8 2 8; -fx-background-radius: 4;");
             }
@@ -421,7 +421,7 @@ public class RegisterForm extends VBox {
         public FkComboBox(FieldDescriptor fd) {
             this.fd = fd;
             setMaxWidth(Double.MAX_VALUE);
-            setPromptText("— select " + fd.label() + " —");
+            setPromptText("— seleccionar " + fd.label() + " —");
         }
 
         /**
@@ -466,7 +466,7 @@ public class RegisterForm extends VBox {
                 }
             }
             // Value not in list (e.g. inactive FK) — add a read-only placeholder
-            getItems().add(value + " — (not in active list)");
+            getItems().add(value + " — (no está en la lista activa)");
             rawValues.add(value);
             getSelectionModel().select(getItems().size() - 1);
         }

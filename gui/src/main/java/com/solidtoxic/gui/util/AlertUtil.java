@@ -19,11 +19,11 @@ public final class AlertUtil {
     }
 
     public static void showWarning(String message) {
-        show(AlertType.WARNING, "Warning", message);
+        show(AlertType.WARNING, "Advertencia", message);
     }
 
     public static void showInfo(String message) {
-        show(AlertType.INFORMATION, "Information", message);
+        show(AlertType.INFORMATION, "Información", message);
     }
 
     private static void show(AlertType type, String title, String message) {

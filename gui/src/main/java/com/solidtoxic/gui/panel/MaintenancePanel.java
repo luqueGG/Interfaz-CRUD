@@ -85,12 +85,12 @@ public abstract class MaintenancePanel extends BorderPane {
                         .readValue(resp.getBody(), new TypeReference<>() {});
                 gridData.setRows(rows);
             } else {
-                AlertUtil.showError("Failed to load records: " + extractErrors(resp.getBody()));
+                AlertUtil.showError("No se pudieron cargar los registros: " + extractErrors(resp.getBody()));
             }
         } catch (BackendUnavailableException e) {
-            AlertUtil.showError("Connection Error", "Cannot reach the backend: " + e.getMessage());
+            AlertUtil.showError("Error de Conexión", "No se pudo contactar al backend: " + e.getMessage());
         } catch (Exception e) {
-            AlertUtil.showError("Unexpected error loading records: " + e.getMessage());
+            AlertUtil.showError("Error inesperado al cargar registros: " + e.getMessage());
         }
     }
 
@@ -98,16 +98,16 @@ public abstract class MaintenancePanel extends BorderPane {
         try {
             ApiResponse resp = api.post(getBasePath(), data);
             if (resp.isSuccess()) {
-                AlertUtil.showInfo("Record created successfully.");
+                AlertUtil.showInfo("Registro creado exitosamente.");
                 form.clearAndReset();
                 loadGrid();
             } else {
-                AlertUtil.showError("Validation Error", extractErrors(resp.getBody()));
+                AlertUtil.showError("Error de Validación", extractErrors(resp.getBody()));
             }
         } catch (BackendUnavailableException e) {
-            AlertUtil.showError("Connection Error", e.getMessage());
+            AlertUtil.showError("Error de Conexión", e.getMessage());
         } catch (Exception e) {
-            AlertUtil.showError("Unexpected error: " + e.getMessage());
+            AlertUtil.showError("Error inesperado: " + e.getMessage());
         }
     }
 
@@ -118,16 +118,16 @@ public abstract class MaintenancePanel extends BorderPane {
         try {
             ApiResponse resp = api.put(getBasePath() + "/" + idPath, data);
             if (resp.isSuccess()) {
-                AlertUtil.showInfo("Record updated successfully.");
+                AlertUtil.showInfo("Registro actualizado exitosamente.");
                 form.clearAndReset();
                 loadGrid();
             } else {
-                AlertUtil.showError("Validation Error", extractErrors(resp.getBody()));
+                AlertUtil.showError("Error de Validación", extractErrors(resp.getBody()));
             }
         } catch (BackendUnavailableException e) {
-            AlertUtil.showError("Connection Error", e.getMessage());
+            AlertUtil.showError("Error de Conexión", e.getMessage());
         } catch (Exception e) {
-            AlertUtil.showError("Unexpected error: " + e.getMessage());
+            AlertUtil.showError("Error inesperado: " + e.getMessage());
         }
     }
 
@@ -140,12 +140,12 @@ public abstract class MaintenancePanel extends BorderPane {
                 form.clearAndReset();
                 loadGrid();
             } else {
-                AlertUtil.showError("State Change Error", extractErrors(resp.getBody()));
+                AlertUtil.showError("Error de Cambio de Estado", extractErrors(resp.getBody()));
             }
         } catch (BackendUnavailableException e) {
-            AlertUtil.showError("Connection Error", e.getMessage());
+            AlertUtil.showError("Error de Conexión", e.getMessage());
         } catch (Exception e) {
-            AlertUtil.showError("Unexpected error: " + e.getMessage());
+            AlertUtil.showError("Error inesperado: " + e.getMessage());
         }
     }
 

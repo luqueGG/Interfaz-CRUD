@@ -8,11 +8,11 @@ import java.util.Map;
 public class NivelToxicidadPanel extends MaintenancePanel {
 
     public NivelToxicidadPanel() {
-        super("Toxicity Levels — TR_Nivel_Toxicidad", List.of(
+        super("Niveles de Toxicidad — TR_Nivel_Toxicidad", List.of(
                 FieldDescriptor.pk("idToxicidad", "ID_Toxicidad", 10),
                 new FieldDescriptor("nivel", "Nivel", 20),
                 new FieldDescriptor("descripcion", "Descripcion", 250),
-                new FieldDescriptor("estReg", "State", 1)
+                new FieldDescriptor("estReg", "Estado", 1)
         ));
     }
 

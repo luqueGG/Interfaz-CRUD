@@ -14,7 +14,7 @@ public class MainApp extends Application {
     public void start(Stage primaryStage) {
         MainWindow root = new MainWindow();
         Scene scene = new Scene(root, 1100, 720);
-        primaryStage.setTitle("SolidToxic — Toxic Waste Management System");
+        primaryStage.setTitle("SolidToxic — Sistema de Gestión de Residuos Tóxicos");
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(800);
         primaryStage.setMinHeight(500);

@@ -8,11 +8,11 @@ import java.util.Map;
 public class ResiduoConstituyentePanel extends MaintenancePanel {
 
     public ResiduoConstituyentePanel() {
-        super("Waste Composition — Residuo_Constituyente", List.of(
+        super("Composición de Residuos — Residuo_Constituyente", List.of(
                 FieldDescriptor.fk("codResiduo", "Residuo", "residuo", "codResiduo", "codResiduo"),
                 FieldDescriptor.fk("codConstituyente", "Constituyente", "constituyente", "codConstituyente", "nombreConstituyente"),
                 new FieldDescriptor("cantidad", "Cantidad", 15),
-                new FieldDescriptor("estReg", "State", 1)
+                new FieldDescriptor("estReg", "Estado", 1)
         ));
     }
 

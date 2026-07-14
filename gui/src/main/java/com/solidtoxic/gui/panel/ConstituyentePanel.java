@@ -8,11 +8,11 @@ import java.util.Map;
 public class ConstituyentePanel extends MaintenancePanel {
 
     public ConstituyentePanel() {
-        super("Chemical Constituents — Constituyente", List.of(
+        super("Constituyentes Químicos — Constituyente", List.of(
                 FieldDescriptor.pk("codConstituyente", "Cod_Constituyente", 20),
                 new FieldDescriptor("nombreConstituyente", "Nombre_Constituyente", 100),
                 FieldDescriptor.large("otrosDatos", "Otros_Datos"),
-                new FieldDescriptor("estReg", "State", 1)
+                new FieldDescriptor("estReg", "Estado", 1)
         ));
     }
 

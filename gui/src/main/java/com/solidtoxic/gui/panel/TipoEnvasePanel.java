@@ -8,11 +8,11 @@ import java.util.Map;
 public class TipoEnvasePanel extends MaintenancePanel {
 
     public TipoEnvasePanel() {
-        super("Packaging Types — TR_Tipo_Envase", List.of(
+        super("Tipos de Envase — TR_Tipo_Envase", List.of(
                 FieldDescriptor.pk("idEnvase", "ID_Envase", 10),
                 new FieldDescriptor("nombreEnvase", "Nombre_Envase", 50),
                 new FieldDescriptor("descripcion", "Descripcion", 250),
-                new FieldDescriptor("estReg", "State", 1)
+                new FieldDescriptor("estReg", "Estado", 1)
         ));
     }
 

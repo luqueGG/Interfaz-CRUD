@@ -8,11 +8,11 @@ import java.util.Map;
 public class TipoTransportePanel extends MaintenancePanel {
 
     public TipoTransportePanel() {
-        super("Transport Types — TR_Tipo_Transporte", List.of(
+        super("Tipos de Transporte — TR_Tipo_Transporte", List.of(
                 FieldDescriptor.pk("idTipoTransporte", "ID_Tipo_Transporte", 10),
                 new FieldDescriptor("nombreTransporte", "Nombre_Transporte", 50),
                 new FieldDescriptor("descripcion", "Descripcion", 250),
-                new FieldDescriptor("estReg", "State", 1)
+                new FieldDescriptor("estReg", "Estado", 1)
         ));
     }
 
