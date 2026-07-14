@@ -1,20 +1,25 @@
 package com.solidtoxic.gui.component;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.solidtoxic.gui.client.ApiClient;
+import com.solidtoxic.gui.client.BackendUnavailableException;
 import com.solidtoxic.gui.util.AlertUtil;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * Generic form panel that renders fields from FieldDescriptor list and exposes
- * the full 7-button command bar with state-machine-driven enable/disable logic.
- * Req 1, 3, 5, 6.
+ * Generic form panel that renders fields from FieldDescriptor list.
+ * Plain fields → TextField / TextArea.
+ * FK fields    → ComboBox populated from GET /api/v1/{fkEndpoint}?state=A.
+ *
+ * Exposes the full 7-button command bar with state-machine-driven enable/disable logic.
+ * Req 1, 3, 5, 6, 10-1..10-4.
  */
 public class RegisterForm extends VBox {
 
@@ -22,9 +27,14 @@ public class RegisterForm extends VBox {
     private OperationMode mode = OperationMode.IDLE;
     private Map<String, Object> selectedRow = null;
 
-    // ── Fields ────────────────────────────────────────────────────────────────
+    // ── Field descriptors ─────────────────────────────────────────────────────
     private final List<FieldDescriptor> descriptors;
-    private final Map<String, TextInputControl> fieldControls = new LinkedHashMap<>();
+
+    /**
+     * Holds the control for each field key.
+     * Value is either a TextInputControl (plain/large) or a FkComboBox (FK).
+     */
+    private final Map<String, Control> fieldControls = new LinkedHashMap<>();
 
     // ── State badge ───────────────────────────────────────────────────────────
     private final Label stateBadge = new Label("ACTIVE");
@@ -46,6 +56,13 @@ public class RegisterForm extends VBox {
     private Consumer<Map<String, Object>> onReactivate;
     private Runnable onCancel;
 
+    // ── API client (for FK loading) ───────────────────────────────────────────
+    private final ApiClient api = ApiClient.getInstance();
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Constructor
+    // ─────────────────────────────────────────────────────────────────────────
+
     public RegisterForm(List<FieldDescriptor> descriptors) {
         this.descriptors = descriptors;
         setSpacing(10);
@@ -58,9 +75,14 @@ public class RegisterForm extends VBox {
 
         wireButtons();
         refreshButtonStates();
+
+        // Load all FK ComboBoxes on construction
+        loadAllFkComboBoxes();
     }
 
-    // ── Build helpers ─────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // Build helpers
+    // ─────────────────────────────────────────────────────────────────────────
 
     private HBox buildStateBadgeRow() {
         HBox row = new HBox(8);
@@ -83,25 +105,36 @@ public class RegisterForm extends VBox {
         int row = 0;
         for (FieldDescriptor fd : descriptors) {
             if ("estReg".equals(fd.key())) continue; // shown as badge only
+
             Label lbl = new Label(fd.label() + ":");
-            TextInputControl control;
-            if (fd.isLarge()) {
+
+            if (fd.isFk()) {
+                // ── FK ComboBox ───────────────────────────────────────────
+                FkComboBox combo = new FkComboBox(fd);
+                fieldControls.put(fd.key(), combo);
+                grid.add(lbl, 0, row);
+                grid.add(combo, 1, row);
+            } else if (fd.isLarge()) {
+                // ── TextArea ──────────────────────────────────────────────
                 TextArea ta = new TextArea();
                 ta.setPrefRowCount(2);
                 ta.setWrapText(true);
-                control = ta;
+                fieldControls.put(fd.key(), ta);
+                grid.add(lbl, 0, row);
+                grid.add(ta, 1, row);
             } else {
-                control = new TextField();
+                // ── TextField ─────────────────────────────────────────────
+                TextField tf = new TextField();
                 if (fd.maxLength() > 0) {
                     final int max = fd.maxLength();
-                    control.textProperty().addListener((obs, o, n) -> {
-                        if (n != null && n.length() > max) ((TextField) control).setText(o);
+                    tf.textProperty().addListener((obs, o, n) -> {
+                        if (n != null && n.length() > max) tf.setText(o);
                     });
                 }
+                fieldControls.put(fd.key(), tf);
+                grid.add(lbl, 0, row);
+                grid.add(tf, 1, row);
             }
-            fieldControls.put(fd.key(), control);
-            grid.add(lbl, 0, row);
-            grid.add(control, 1, row);
             row++;
         }
         return grid;
@@ -123,7 +156,43 @@ public class RegisterForm extends VBox {
         return bar;
     }
 
-    // ── Button wiring ─────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // FK ComboBox loading
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** Loads all FK ComboBoxes. Called once at construction; can be re-called to refresh. */
+    public void loadAllFkComboBoxes() {
+        for (FieldDescriptor fd : descriptors) {
+            if (fd.isFk()) {
+                loadFkComboBox((FkComboBox) fieldControls.get(fd.key()), fd);
+            }
+        }
+    }
+
+    private void loadFkComboBox(FkComboBox combo, FieldDescriptor fd) {
+        try {
+            var resp = api.get("/api/v1/" + fd.fkEndpoint() + "?state=A");
+            if (resp.isSuccess()) {
+                List<Map<String, Object>> rows = api.getMapper()
+                        .readValue(resp.getBody(), new TypeReference<>() {});
+                combo.setItems(rows, fd.fkValueKey(), fd.fkLabelKey());
+                combo.setDisable(false);
+            } else {
+                combo.setDisable(true);
+                AlertUtil.showWarning("Could not load options for \"" + fd.label() + "\" — field disabled.");
+            }
+        } catch (BackendUnavailableException e) {
+            combo.setDisable(true);
+            AlertUtil.showWarning("Backend unreachable: \"" + fd.label() + "\" ComboBox disabled.");
+        } catch (Exception e) {
+            combo.setDisable(true);
+            AlertUtil.showWarning("Error loading \"" + fd.label() + "\": " + e.getMessage());
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Button wiring
+    // ─────────────────────────────────────────────────────────────────────────
 
     private void wireButtons() {
         // Add — clears form, enters ADD mode (Req 1-1)
@@ -134,6 +203,7 @@ public class RegisterForm extends VBox {
             mode = OperationMode.ADD;
             selectedRow = null;
             applyBadgeStyle("A");
+            loadAllFkComboBoxes();
             refreshButtonStates();
         });
 
@@ -184,13 +254,15 @@ public class RegisterForm extends VBox {
         });
     }
 
-    // ── Button enable/disable state machine ───────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // Button enable/disable state machine
+    // ─────────────────────────────────────────────────────────────────────────
 
     public void refreshButtonStates() {
         boolean rowSelected = selectedRow != null;
         String estReg = rowSelected ? getEstRegFromRow() : null;
 
-        btnAdd.setDisable(false);                                          // always enabled
+        btnAdd.setDisable(false);
         btnModify.setDisable(!rowSelected);
         btnDelete.setDisable(!rowSelected);
         btnInactivate.setDisable(!rowSelected || !"A".equals(estReg));
@@ -199,12 +271,23 @@ public class RegisterForm extends VBox {
         btnCancel.setDisable(mode == OperationMode.IDLE);
     }
 
-    // ── Data access ───────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // Data access
+    // ─────────────────────────────────────────────────────────────────────────
 
+    /**
+     * Returns form values as a map keyed by field key.
+     * FK fields contribute their stored value (the PK of the referenced row).
+     */
     public Map<String, Object> getData() {
         Map<String, Object> result = new LinkedHashMap<>();
-        for (Map.Entry<String, TextInputControl> entry : fieldControls.entrySet()) {
-            result.put(entry.getKey(), entry.getValue().getText());
+        for (Map.Entry<String, Control> entry : fieldControls.entrySet()) {
+            Control ctrl = entry.getValue();
+            if (ctrl instanceof FkComboBox fk) {
+                result.put(entry.getKey(), fk.getSelectedValue());
+            } else if (ctrl instanceof TextInputControl tic) {
+                result.put(entry.getKey(), tic.getText());
+            }
         }
         return result;
     }
@@ -223,37 +306,58 @@ public class RegisterForm extends VBox {
         refreshButtonStates();
     }
 
-    // ── Internal helpers ──────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // Internal helpers
+    // ─────────────────────────────────────────────────────────────────────────
 
     private void populateFields(Map<String, Object> row) {
-        for (Map.Entry<String, TextInputControl> entry : fieldControls.entrySet()) {
+        for (Map.Entry<String, Control> entry : fieldControls.entrySet()) {
             Object val = row.get(entry.getKey());
-            entry.getValue().setText(val != null ? val.toString() : "");
+            String strVal = val != null ? val.toString() : "";
+            Control ctrl = entry.getValue();
+            if (ctrl instanceof FkComboBox fk) {
+                fk.selectByValue(strVal);
+            } else if (ctrl instanceof TextInputControl tic) {
+                tic.setText(strVal);
+            }
         }
         if (row.containsKey("estReg")) applyBadgeStyle(row.get("estReg").toString());
     }
 
     private void clearFields() {
-        fieldControls.values().forEach(c -> c.setText(""));
+        for (Control ctrl : fieldControls.values()) {
+            if (ctrl instanceof FkComboBox fk) {
+                fk.clearSelection();
+            } else if (ctrl instanceof TextInputControl tic) {
+                tic.setText("");
+            }
+        }
         applyBadgeStyle("A");
     }
 
     private void setAllEditable(boolean editable) {
-        fieldControls.values().forEach(c -> c.setEditable(editable));
+        for (Control ctrl : fieldControls.values()) {
+            if (ctrl instanceof FkComboBox fk) {
+                fk.setDisable(!editable || fk.isFailed());
+            } else if (ctrl instanceof TextInputControl tic) {
+                tic.setEditable(editable);
+            }
+        }
     }
 
     private void lockPkFields(boolean locked) {
         for (FieldDescriptor fd : descriptors) {
             if (fd.isPk()) {
-                TextInputControl ctrl = fieldControls.get(fd.key());
-                if (ctrl != null) ctrl.setEditable(!locked);
+                Control ctrl = fieldControls.get(fd.key());
+                if (ctrl instanceof TextInputControl tic) tic.setEditable(!locked);
+                else if (ctrl instanceof FkComboBox fk) fk.setDisable(locked || fk.isFailed());
             }
         }
     }
 
     private void lockEstReg(boolean locked) {
-        TextInputControl ctrl = fieldControls.get("estReg");
-        if (ctrl != null) ctrl.setEditable(!locked);
+        Control ctrl = fieldControls.get("estReg");
+        if (ctrl instanceof TextInputControl tic) tic.setEditable(!locked);
     }
 
     private String getEstRegFromRow() {
@@ -286,7 +390,9 @@ public class RegisterForm extends VBox {
         }
     }
 
-    // ── Callback setters ──────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // Callback setters
+    // ─────────────────────────────────────────────────────────────────────────
 
     public void setOnAdd(Consumer<Map<String, Object>> handler)        { this.onAdd = handler; }
     public void setOnModify(Consumer<Map<String, Object>> handler)     { this.onModify = handler; }
@@ -296,4 +402,81 @@ public class RegisterForm extends VBox {
     public void setOnCancel(Runnable handler)                          { this.onCancel = handler; }
 
     public OperationMode getMode() { return mode; }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Inner class: FkComboBox
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * A ComboBox that displays "ID — Label" strings but stores and returns the raw FK value.
+     * Keeps a parallel list of raw value strings aligned with the display items.
+     */
+    public static class FkComboBox extends ComboBox<String> {
+
+        private final FieldDescriptor fd;
+        /** Raw values (FK ids) aligned by index with the ComboBox items list. */
+        private final List<String> rawValues = new ArrayList<>();
+        private boolean failed = false;
+
+        public FkComboBox(FieldDescriptor fd) {
+            this.fd = fd;
+            setMaxWidth(Double.MAX_VALUE);
+            setPromptText("— select " + fd.label() + " —");
+        }
+
+        /**
+         * Populates the ComboBox from a list of rows fetched from the referenced table.
+         *
+         * @param rows       list of maps from the API
+         * @param valueKey   key whose value is stored/submitted (the FK id)
+         * @param labelKey   key whose value is shown alongside the id
+         */
+        public void setItems(List<Map<String, Object>> rows, String valueKey, String labelKey) {
+            getItems().clear();
+            rawValues.clear();
+            failed = false;
+            for (Map<String, Object> row : rows) {
+                Object rawVal = row.get(valueKey);
+                Object labelVal = row.get(labelKey);
+                String display = (rawVal != null ? rawVal.toString() : "?")
+                        + " — "
+                        + (labelVal != null ? labelVal.toString() : "");
+                getItems().add(display);
+                rawValues.add(rawVal != null ? rawVal.toString() : "");
+            }
+        }
+
+        /** Returns the raw FK value of the currently selected item, or empty string if none. */
+        public String getSelectedValue() {
+            int idx = getSelectionModel().getSelectedIndex();
+            if (idx < 0 || idx >= rawValues.size()) return "";
+            return rawValues.get(idx);
+        }
+
+        /** Selects the item whose raw value matches {@code value}. */
+        public void selectByValue(String value) {
+            if (value == null || value.isBlank()) {
+                getSelectionModel().clearSelection();
+                return;
+            }
+            for (int i = 0; i < rawValues.size(); i++) {
+                if (value.equals(rawValues.get(i))) {
+                    getSelectionModel().select(i);
+                    return;
+                }
+            }
+            // Value not in list (e.g. inactive FK) — add a read-only placeholder
+            getItems().add(value + " — (not in active list)");
+            rawValues.add(value);
+            getSelectionModel().select(getItems().size() - 1);
+        }
+
+        public void clearSelection() {
+            getSelectionModel().clearSelection();
+        }
+
+        /** True if the last load attempt failed (endpoint unreachable). */
+        public boolean isFailed() { return failed; }
+        public void markFailed()  { this.failed = true; }
+    }
 }
