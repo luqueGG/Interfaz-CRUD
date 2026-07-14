@@ -1,6 +1,7 @@
 com\solidtoxic\gui\panel\ConstituyentePanel.class
 com\solidtoxic\gui\component\OperationMode.class
 com\solidtoxic\gui\panel\MaintenancePanel.class
+com\solidtoxic\gui\component\RegisterForm$FkComboBox.class
 com\solidtoxic\gui\component\FieldDescriptor.class
 com\solidtoxic\gui\client\ApiClient.class
 com\solidtoxic\gui\panel\RegionPanel.class
@@ -13,6 +14,7 @@ com\solidtoxic\gui\panel\ResiduoConstituyentePanel.class
 com\solidtoxic\gui\panel\ResiduoPanel.class
 com\solidtoxic\gui\MainApp.class
 com\solidtoxic\gui\panel\MaintenancePanel$1.class
+com\solidtoxic\gui\component\RegisterForm$1.class
 com\solidtoxic\gui\panel\TrasladoPanel.class
 com\solidtoxic\gui\MainWindow.class
 com\solidtoxic\gui\panel\DestinoPanel.class
