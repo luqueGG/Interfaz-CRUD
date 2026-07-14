@@ -10,12 +10,12 @@ public class TrasladoPanel extends MaintenancePanel {
     public TrasladoPanel() {
         super("Shipments — Traslado", List.of(
                 FieldDescriptor.pk("idTraslado", "ID_Traslado", 10),
-                new FieldDescriptor("codResiduo", "Cod_Residuo", 20),
-                new FieldDescriptor("codDestino", "Cod_Destino", 20),
+                FieldDescriptor.fk("codResiduo", "Residuo", "residuo", "codResiduo", "codResiduo"),
+                FieldDescriptor.fk("codDestino", "Destino", "destino", "codDestino", "nombreDestino"),
                 new FieldDescriptor("fechaEnvio", "Fecha_Envio (YYYY-MM-DD)", 10),
                 new FieldDescriptor("cantidadTrasladada", "Cantidad_Trasladada", 15),
-                new FieldDescriptor("idEnvase", "ID_Envase", 10),
-                new FieldDescriptor("idTratamiento", "ID_Tratamiento", 10),
+                FieldDescriptor.fk("idEnvase", "Tipo Envase", "envase", "idEnvase", "nombreEnvase"),
+                FieldDescriptor.fk("idTratamiento", "Tipo Tratamiento", "tratamiento", "idTratamiento", "nombreTratamiento"),
                 new FieldDescriptor("fechaLlegada", "Fecha_Llegada (YYYY-MM-DD)", 10),
                 FieldDescriptor.large("otrosDatos", "Otros_Datos"),
                 new FieldDescriptor("estReg", "State", 1)

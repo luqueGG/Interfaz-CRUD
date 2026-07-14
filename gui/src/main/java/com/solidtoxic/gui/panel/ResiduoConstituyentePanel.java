@@ -9,8 +9,8 @@ public class ResiduoConstituyentePanel extends MaintenancePanel {
 
     public ResiduoConstituyentePanel() {
         super("Waste Composition — Residuo_Constituyente", List.of(
-                FieldDescriptor.pk("codResiduo", "Cod_Residuo", 20),
-                FieldDescriptor.pk("codConstituyente", "Cod_Constituyente", 20),
+                FieldDescriptor.fk("codResiduo", "Residuo", "residuo", "codResiduo", "codResiduo"),
+                FieldDescriptor.fk("codConstituyente", "Constituyente", "constituyente", "codConstituyente", "nombreConstituyente"),
                 new FieldDescriptor("cantidad", "Cantidad", 15),
                 new FieldDescriptor("estReg", "State", 1)
         ));
@@ -20,7 +20,6 @@ public class ResiduoConstituyentePanel extends MaintenancePanel {
 
     @Override
     protected String buildIdPath(Map<String, Object> row) {
-        // Composite key: /codResiduo/codConstituyente
         return row.get("codResiduo") + "/" + row.get("codConstituyente");
     }
 }

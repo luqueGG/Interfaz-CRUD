@@ -79,7 +79,7 @@ public abstract class MaintenancePanel extends BorderPane {
 
     protected void loadGrid() {
         try {
-            ApiResponse resp = api.get(getBasePath() + "?state=A");
+            ApiResponse resp = api.get(getBasePath());
             if (resp.isSuccess()) {
                 List<Map<String, Object>> rows = api.getMapper()
                         .readValue(resp.getBody(), new TypeReference<>() {});

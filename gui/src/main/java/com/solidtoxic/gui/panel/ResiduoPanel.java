@@ -10,9 +10,9 @@ public class ResiduoPanel extends MaintenancePanel {
     public ResiduoPanel() {
         super("Hazardous Waste — Residuo", List.of(
                 FieldDescriptor.pk("codResiduo", "Cod_Residuo", 20),
-                new FieldDescriptor("nifEmpresa", "NIF_Empresa", 20),
-                new FieldDescriptor("codEstandar", "Cod_Estandar", 10),
-                new FieldDescriptor("idToxicidad", "ID_Toxicidad", 10),
+                FieldDescriptor.fk("nifEmpresa", "Empresa Productora", "productora", "nifEmpresa", "nombreEmpresa"),
+                FieldDescriptor.fk("codEstandar", "Residuo Estandarizado", "estandar", "codEstandar", "nombreEstandar"),
+                FieldDescriptor.fk("idToxicidad", "Nivel Toxicidad", "toxicidad", "idToxicidad", "nivel"),
                 new FieldDescriptor("cantidadTotal", "Cantidad_Total", 15),
                 FieldDescriptor.large("otrosDatos", "Otros_Datos"),
                 new FieldDescriptor("estReg", "State", 1)

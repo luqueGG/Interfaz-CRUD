@@ -10,7 +10,7 @@ public class DestinoPanel extends MaintenancePanel {
     public DestinoPanel() {
         super("Destination Facilities — Destino", List.of(
                 FieldDescriptor.pk("codDestino", "Cod_Destino", 20),
-                new FieldDescriptor("idRegion", "ID_Region", 10),
+                FieldDescriptor.fk("idRegion", "Region", "region", "idRegion", "nombreRegion"),
                 new FieldDescriptor("nombreDestino", "Nombre_Destino", 100),
                 new FieldDescriptor("ciudadDestino", "Ciudad_Destino", 50),
                 new FieldDescriptor("capacidadMaxima", "Capacidad_Maxima", 15),
