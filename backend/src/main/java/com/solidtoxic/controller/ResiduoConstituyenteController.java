@@ -30,8 +30,8 @@ public class ResiduoConstituyenteController {
     }
 
     @GetMapping
-    public List<ResiduoConstituyente> getAll(@RequestParam(defaultValue = "A") String state) {
-        return service.getByState(state);
+    public List<ResiduoConstituyente> getAll(@RequestParam(required = false) String state) {
+        return state != null ? service.getByState(state) : service.getAll();
     }
 
     @GetMapping("/residuo/{codResiduo}")

@@ -21,8 +21,8 @@ public class EmpresaTransportistaController {
     }
 
     @GetMapping
-    public List<EmpresaTransportista> getAll(@RequestParam(defaultValue = "A") String state) {
-        return service.getByState(state);
+    public List<EmpresaTransportista> getAll(@RequestParam(required = false) String state) {
+        return state != null ? service.getByState(state) : service.getAll();
     }
 
     @GetMapping("/{id}")

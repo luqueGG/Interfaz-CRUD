@@ -21,8 +21,8 @@ public class TipoTransporteController {
     }
 
     @GetMapping
-    public List<TipoTransporte> getAll(@RequestParam(defaultValue = "A") String state) {
-        return service.getByState(state);
+    public List<TipoTransporte> getAll(@RequestParam(required = false) String state) {
+        return state != null ? service.getByState(state) : service.getAll();
     }
 
     @GetMapping("/{id}")

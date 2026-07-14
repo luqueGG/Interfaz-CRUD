@@ -21,8 +21,8 @@ public class TrasladoController {
     }
 
     @GetMapping
-    public List<Traslado> getAll(@RequestParam(defaultValue = "A") String state) {
-        return service.getByState(state);
+    public List<Traslado> getAll(@RequestParam(required = false) String state) {
+        return state != null ? service.getByState(state) : service.getAll();
     }
 
     @GetMapping("/{id}")

@@ -21,8 +21,8 @@ public class RegionController {
     }
 
     @GetMapping
-    public List<Region> getAll(@RequestParam(defaultValue = "A") String state) {
-        return service.getByState(state);
+    public List<Region> getAll(@RequestParam(required = false) String state) {
+        return state != null ? service.getByState(state) : service.getAll();
     }
 
     @GetMapping("/{id}")

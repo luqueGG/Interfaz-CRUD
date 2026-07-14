@@ -30,8 +30,8 @@ public class TrasladoTransportistaController {
     }
 
     @GetMapping
-    public List<TrasladoTransportista> getAll(@RequestParam(defaultValue = "A") String state) {
-        return service.getByState(state);
+    public List<TrasladoTransportista> getAll(@RequestParam(required = false) String state) {
+        return state != null ? service.getByState(state) : service.getAll();
     }
 
     @GetMapping("/traslado/{idTraslado}")

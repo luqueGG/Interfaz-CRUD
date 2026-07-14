@@ -21,8 +21,8 @@ public class DestinoController {
     }
 
     @GetMapping
-    public List<Destino> getAll(@RequestParam(defaultValue = "A") String state) {
-        return service.getByState(state);
+    public List<Destino> getAll(@RequestParam(required = false) String state) {
+        return state != null ? service.getByState(state) : service.getAll();
     }
 
     @GetMapping("/{id}")
