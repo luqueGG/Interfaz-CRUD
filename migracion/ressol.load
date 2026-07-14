@@ -1,0 +1,9 @@
+LOAD DATABASE
+     FROM      mysql://root:migracion123@host.docker.internal:3307/ressol
+     INTO      postgresql://jimpe@host.docker.internal:5432/ressol
+
+WITH include drop, create tables, create indexes, reset sequences,
+     workers = 8, concurrency = 1,
+     multiple readers per thread, rows per range = 50000
+
+CAST type date drop not null drop default using zero-dates-to-null;
