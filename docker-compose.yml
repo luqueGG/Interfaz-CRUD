@@ -10,7 +10,8 @@ services:
       POSTGRES_USER: solidtoxic_user
       POSTGRES_PASSWORD: solidtoxic_pass
     volumes:
-      - ./db/postresiduos.sql:/docker-entrypoint-initdb.d/postresiduos.sql:ro
+      - ./db/postresiduos.sql:/docker-entrypoint-initdb.d/01_postresiduos.sql:ro
+      - ./db/02_vistas_triggers_procedimientos.sql:/docker-entrypoint-initdb.d/02_vistas_triggers_procedimientos.sql:ro
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
