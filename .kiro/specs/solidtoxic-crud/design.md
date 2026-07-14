@@ -342,7 +342,12 @@ To support generalized maintenance operations across any table (e.g., `TR_Nivel_
 
 | HTTP Method | Endpoint Pattern | Description | Corresponding Requirement |
 | --- | --- | --- | --- |
-| **GET** | `/api/v1/{resource}?state=A` | Fetches all active records for the grid Req 2-1| **GET** | `/api/v1/{resource}/{id}` | Fetches a specific record by ID Req 2-2, Req 3-1| **POST** | `/api/v1/{resource}` | Validates and inserts a new active record (`estReg='A'`). | Req 1-1, Req 7| **PUT** | `/api/v1/{resource}/{id}` | Updates permitted editable fields of an existing record Req 3-2, Req 3-5| **PATCH** | `/api/v1/{resource}/{id}/state` | Modifies only the `estReg` value (`*`, `I`, or `A`). | Req 1-3 to 1-5, Req 4
+| **GET** | `/api/v1/{resource}` | Fetches **all records** (all states) for the grid. | Req 2-1 |
+| **GET** | `/api/v1/{resource}?state={state}` | Fetches records filtered by a specific `estReg` value (used by FK ComboBox population). | Req 10-2 |
+| **GET** | `/api/v1/{resource}/{id}` | Fetches a specific record by ID. | Req 2-2, Req 3-1 |
+| **POST** | `/api/v1/{resource}` | Validates and inserts a new active record (`estReg='A'`). | Req 1-1, Req 7 |
+| **PUT** | `/api/v1/{resource}/{id}` | Updates permitted editable fields of an existing record. | Req 3-2, Req 3-5 |
+| **PATCH** | `/api/v1/{resource}/{id}/state` | Modifies only the `estReg` value (`*`, `I`, or `A`). | Req 1-3 to 1-5, Req 4 |
 ### 3. Backend Validation Rules (`Req 7`)
 
 Before committing any transaction, the Service layer verifies:
@@ -361,11 +366,15 @@ The desktop client is composed of custom JavaFX components coordinated by a cent
 ### 1. `GridData` Component (`Req 2`)
 
 * Implemented using JavaFX `TableView`.
-* On application startup, it calls the GET endpoint to populate the table exclusively with active records (`estReg = 'A'`).
-* Selecting a row triggers an event listener that passes the selected record's data to the `RegisterForm` Displays an empty state message when no records are returned by the API### 2. `RegisterForm` Component (`Req 1, 3, 5, 6`)
+* On application startup, it calls the GET endpoint **without a state filter** to populate the table with **all records** regardless of their `estReg` value (Active, Inactive, and Deleted).
+* Rows are visually distinguished by state: active rows use the default style, inactive rows are rendered in a muted/grey style, and deleted rows are rendered with a strikethrough or red-tinted style.
+* Selecting a row triggers an event listener that passes the selected record's data to the `RegisterForm`.
+* Displays an empty state message when no records are returned by the API.### 2. `RegisterForm` Component (`Req 1, 3, 5, 6, 10`)
 
 * Contains JavaFX `TextField`, `TextArea`, and `ComboBox` controls matching the columns of the active entity.
-* Includes a read-only visual badge/label indicating the current `State_Record` (`Active`, `Inactive`, or `Deleted`) Controls button availability dynamically based on application mode:
+* **Foreign key fields are always rendered as `ComboBox` controls.** Each FK ComboBox is pre-populated from its referenced endpoint (all records, regardless of state, so the operator can still reference inactive entries when inspecting existing data). The ComboBox displays a human-readable label (e.g., name or description) paired with the underlying ID value.
+* Includes a read-only visual badge/label indicating the current `State_Record` (`Active`, `Inactive`, or `Deleted`).
+* Controls button availability dynamically based on application mode:
 
 | Button Command | Enabled When... | Action / Behavior |
 | --- | --- | --- |
@@ -388,7 +397,10 @@ The desktop client is composed of custom JavaFX components coordinated by a cent
 1. **Operator** selects a row in `GridData` and clicks **Modify**. `RegisterForm` populates with row data, locks the ID field and State indicator, and transitions to `MODIFY` mode. **Operator** updates editable values and clicks **Update**. Client sends a `PUT` request to `/api/v1/{resource}/{id}`. Backend updates the record in PostgreSQL, leaving `estReg` and the ID untouched.
 6. Upon `200 OK`, `GridData` refreshes and the form resets### 3. State Management (Delete / Inactivate / Reactivate)
 
-1. **Operator** selects a row in `GridData` and clicks **Delete**, **Inactivate**, or **Reactivate**. Client immediately sends a `PATCH` request with the new state target (`*`, `I`, or `A`) without requiring an **Update** confirmation step. Backend executes `UPDATE table SET estReg = ? WHERE id = ?` via JDBC. Client refreshes `GridData` immediately; if inactivated or deleted, the record disappears from the active grid view---
+1. **Operator** selects a row in `GridData` and clicks **Delete**, **Inactivate**, or **Reactivate**.
+2. Client immediately sends a `PATCH` request with the new state target (`*`, `I`, or `A`) without requiring an **Update** confirmation step.
+3. Backend executes `UPDATE table SET estReg = ? WHERE id = ?` via JDBC.
+4. Client refreshes `GridData` immediately. The record **remains visible** in the grid with its updated `estReg` value reflected in the row style (inactive rows appear muted, deleted rows appear with a strikethrough/red tint).---
 
 ## Error Handling & Connectivity Strategy
 

@@ -40,7 +40,7 @@ This document defines the requirements for the **SolidToxic CRUD** feature — a
 
 #### Acceptance Criteria
 
-1. WHEN THE System starts successfully, THEN THE System SHALL display all active records in the Grid_Data.
+1. WHEN THE System starts successfully, THEN THE System SHALL display ALL records in the Grid_Data regardless of their State_Record value (Active, Inactive, or Deleted).
 2. WHEN an Operator selects a record from the Grid_Data, THEN THE System SHALL load the selected record into the Register_Form.
 3. WHEN a record is loaded into the Register_Form, THEN THE System SHALL display all associated field values.
 4. WHEN an Operator selects a different record, THEN THE System SHALL replace the previously displayed data with the newly selected record.
@@ -142,3 +142,17 @@ This document defines the requirements for the **SolidToxic CRUD** feature — a
 3. WHEN an operation fails, THEN THE System SHALL preserve database consistency.
 4. WHEN an operation fails, THEN THE System SHALL allow the Operator to continue using the application whenever possible.
 
+
+
+---
+
+### Requirement 10: Foreign Key Fields as Selectable Controls
+
+**User Story:** As an Operator, I want foreign key fields to be presented as dropdown selects, so that I can choose valid referenced values without typing raw IDs.
+
+#### Acceptance Criteria
+
+1. WHEN a Register_Form contains a field that references another table via a foreign key, THEN THE System SHALL render that field as a ComboBox (dropdown select) instead of a plain text input.
+2. WHEN a ComboBox for a foreign key is rendered, THEN THE System SHALL populate it with all records from the referenced table (regardless of their State_Record), displaying a human-readable label alongside the ID.
+3. WHEN an Operator opens a ComboBox, THEN THE System SHALL show the current value as the selected entry.
+4. WHEN the referenced table cannot be loaded (e.g., backend unavailable), THEN THE System SHALL display an appropriate warning and disable the ComboBox.

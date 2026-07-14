@@ -73,12 +73,25 @@ Tasks are organized in dependency order: project scaffolding → database contai
 For each of the 7 reference tables, implement the full stack: Model → DTO → Repository → Service → Controller.  
 Column names must match the SQL schema exactly.
 
+> **Repository contract (applies to all tables):**  
+> Every repository must implement these methods:
+> - `findAll()` → returns **all records** with no state filter (used by the grid).
+> - `findByState(String state)` → returns records matching the given `estReg` value (used by FK ComboBox loaders to fetch selectable options).
+> - `findById(id)`, `insert(entity)`, `update(entity)` (never touches `estReg` or PK), `updateState(id, newState)`.
+>
+> **Controller contract (applies to all tables):**  
+> Every controller must expose:
+> - `GET /api/v1/{resource}` — all records (no filter).
+> - `GET /api/v1/{resource}?state={state}` — filtered by `estReg`.
+> - `GET /api/v1/{resource}/{id}`, `POST`, `PUT /{id}`, `PATCH /{id}/state`.
+
 ### 3.A — TR_Nivel_Toxicidad (`/api/v1/toxicidad`)
 Columns: `ID_Toxicidad INT PK`, `Nivel VARCHAR(20)`, `Descripcion VARCHAR(250)`, `estReg CHAR(1)`
 
 - [ ] **3.A.1** Create `NivelToxicidad` model and `NivelToxicidadDTO` (with Bean Validation: `@NotBlank` on `Nivel`, `@Size(max=250)` on `Descripcion`).
 - [ ] **3.A.2** Create `NivelToxicidadRepository` using `JdbcTemplate`:
-  - `findAllActive()` → `SELECT ... WHERE estReg = 'A'`
+  - `findAll()` → `SELECT ... ORDER BY ID_Toxicidad` (all records, no state filter)
+  - `findByState(String state)` → `SELECT ... WHERE estReg = ?` (used by FK ComboBox loaders)
   - `findById(int id)`
   - `insert(NivelToxicidad)`
   - `update(NivelToxicidad)` — never touches `estReg` or PK
@@ -88,7 +101,8 @@ Columns: `ID_Toxicidad INT PK`, `Nivel VARCHAR(20)`, `Descripcion VARCHAR(250)`,
   - Duplicate PK check on insert (Req 7-2).
   - Field length validation (Req 7-3).
 - [ ] **3.A.4** Create `NivelToxicidadController` exposing:
-  - `GET /api/v1/toxicidad?state=A`
+  - `GET /api/v1/toxicidad` — returns all records (no state filter)
+  - `GET /api/v1/toxicidad?state={state}` — returns records filtered by `estReg` value
   - `GET /api/v1/toxicidad/{id}`
   - `POST /api/v1/toxicidad`
   - `PUT /api/v1/toxicidad/{id}`
@@ -98,9 +112,9 @@ Columns: `ID_Toxicidad INT PK`, `Nivel VARCHAR(20)`, `Descripcion VARCHAR(250)`,
 Columns: `ID_Envase INT PK`, `Nombre_Envase VARCHAR(50)`, `Descripcion VARCHAR(250)`, `estReg CHAR(1)`
 
 - [ ] **3.B.1** Model + DTO (`@NotBlank` on `Nombre_Envase`, `@Size(max=50)`, `@Size(max=250)` on `Descripcion`).
-- [ ] **3.B.2** `TipoEnvaseRepository` (same 5 methods as 3.A.2).
+- [ ] **3.B.2** `TipoEnvaseRepository` (same 6 methods as 3.A.2: `findAll`, `findByState`, `findById`, `insert`, `update`, `updateState`).
 - [ ] **3.B.3** `TipoEnvaseService` (same validation rules as 3.A.3).
-- [ ] **3.B.4** `TipoEnvaseController` at `/api/v1/envase` (same 5 endpoints as 3.A.4).
+- [ ] **3.B.4** `TipoEnvaseController` at `/api/v1/envase` (same 6 endpoints as 3.A.4).
 
 ### 3.C — TR_Tipo_Tratamiento (`/api/v1/tratamiento`)
 Columns: `ID_Tratamiento INT PK`, `Nombre_Tratamiento VARCHAR(50)`, `Descripcion VARCHAR(250)`, `estReg CHAR(1)`
@@ -246,10 +260,13 @@ Composite PK. Note: column is `Kms_Recorridos` (not `Distancia`).
   - Accepts a list of column descriptors and a list of row maps.
   - Fires a `RowSelectedEvent` with the full row data when the operator selects a row (Req 2-2).
   - Displays an empty-state label when the list is empty (Req 2-5).
+  - Applies row-level CSS styling based on the `estReg` value: default style for `A`, muted/grey style for `I`, strikethrough or red-tinted style for `*` (Req 2-1).
 
 - [ ] **7.2** Implement `component/RegisterForm.java` (generic form):
-  - Accepts a list of field descriptors (name, label, type, editable, maxLength).
-  - Renders `TextField` / `TextArea` / `ComboBox` controls accordingly.
+  - Accepts a list of field descriptors (name, label, type, editable, maxLength, **fkEndpoint** optional).
+  - Renders `TextField` / `TextArea` controls for plain fields and `ComboBox` for foreign key fields (Req 10-1).
+  - FK `ComboBox` controls are populated by calling `GET /api/v1/{fkEndpoint}` (all records) at form initialization and on refresh, and display a human-readable label alongside the stored ID (Req 10-2, 10-3).
+  - If a FK endpoint cannot be reached, the ComboBox is disabled and a warning is shown (Req 10-4).
   - Includes a read-only `State_Record` badge showing `Active`, `Inactive`, or `Deleted` (Req 1-1).
   - Exposes `getData()` → `Map<String, String>` and `setData(Map<String, String>)` methods.
 
@@ -273,22 +290,34 @@ Composite PK. Note: column is `Kms_Recorridos` (not `Distancia`).
 
 ## Phase 8 — GUI: Per-Table Maintenance Panels (12 tables)
 
-For each table, create a dedicated panel class extending or composing `MainWindow`. Each panel wires `GridData` and `RegisterForm` to the specific API endpoint.
+For each table, create a dedicated panel class extending or composing `MainWindow`. Each panel wires `GridData` and `RegisterForm` to the specific API endpoint. The grid always loads **all records** (no state filter). FK fields are always declared with `fkEndpoint` so `RegisterForm` renders them as `ComboBox` controls.
 
-- [ ] **8.1** `panel/NivelToxicidadPanel.java` — endpoint `/api/v1/toxicidad`, columns: `ID_Toxicidad`, `Nivel`, `Descripcion`, `estReg`.
-- [ ] **8.2** `panel/TipoEnvasePanel.java` — endpoint `/api/v1/envase`, columns: `ID_Envase`, `Nombre_Envase`, `Descripcion`, `estReg`.
-- [ ] **8.3** `panel/TipoTratamientoPanel.java` — endpoint `/api/v1/tratamiento`, columns: `ID_Tratamiento`, `Nombre_Tratamiento`, `Descripcion`, `estReg`.
-- [ ] **8.4** `panel/TipoTransportePanel.java` — endpoint `/api/v1/transporte`, columns: `ID_Tipo_Transporte`, `Nombre_Transporte`, `Descripcion`, `estReg`.
-- [ ] **8.5** `panel/ResiduoEstandarizadoPanel.java` — endpoint `/api/v1/estandar`, columns: `Cod_Estandar`, `Nombre_Estandar`, `estReg`.
-- [ ] **8.6** `panel/ConstituyentePanel.java` — endpoint `/api/v1/constituyente`, columns: `Cod_Constituyente`, `Nombre_Constituyente`, `Otros_Datos`, `estReg`.
-- [ ] **8.7** `panel/RegionPanel.java` — endpoint `/api/v1/region`, columns: `ID_Region`, `Nombre_Region`, `estReg`.
-- [ ] **8.8** `panel/EmpresaProductoraPanel.java` — endpoint `/api/v1/productora`, columns: `NIF_Empresa`, `Nombre_Empresa`, `Ciudad_Empresa`, `Actividad`, `Otros_Datos`, `estReg`.
-- [ ] **8.9** `panel/EmpresaTransportistaPanel.java` — endpoint `/api/v1/transportista`, columns: `NIF_Transportista`, `Nombre_Transportista`, `Ciudad_Transportista`, `Otros_Datos`, `estReg`.
-- [ ] **8.10** `panel/DestinoPanel.java` — endpoint `/api/v1/destino`, FK field `ID_Region` rendered as a `ComboBox` populated from `/api/v1/region?state=A`.
-- [ ] **8.11** `panel/ResiduoPanel.java` — endpoint `/api/v1/residuo`, FK fields `NIF_Empresa`, `Cod_Estandar`, `ID_Toxicidad` rendered as `ComboBox` controls populated from their respective endpoints.
-- [ ] **8.12** `panel/ResiduoConstituyentePanel.java` — endpoint `/api/v1/residuo-constituyente`, FK fields as `ComboBox`.
-- [ ] **8.13** `panel/TrasladoPanel.java` — endpoint `/api/v1/traslado`, FK fields `Cod_Residuo`, `Cod_Destino`, `ID_Envase`, `ID_Tratamiento` as `ComboBox`.
-- [ ] **8.14** `panel/TrasladoTransportistaPanel.java` — endpoint `/api/v1/traslado-transportista`, FK fields as `ComboBox`.
+- [ ] **8.1** `panel/NivelToxicidadPanel.java` — endpoint `/api/v1/toxicidad`, columns: `ID_Toxicidad`, `Nivel`, `Descripcion`, `estReg`. No FK fields.
+- [ ] **8.2** `panel/TipoEnvasePanel.java` — endpoint `/api/v1/envase`, columns: `ID_Envase`, `Nombre_Envase`, `Descripcion`, `estReg`. No FK fields.
+- [ ] **8.3** `panel/TipoTratamientoPanel.java` — endpoint `/api/v1/tratamiento`, columns: `ID_Tratamiento`, `Nombre_Tratamiento`, `Descripcion`, `estReg`. No FK fields.
+- [ ] **8.4** `panel/TipoTransportePanel.java` — endpoint `/api/v1/transporte`, columns: `ID_Tipo_Transporte`, `Nombre_Transporte`, `Descripcion`, `estReg`. No FK fields.
+- [ ] **8.5** `panel/ResiduoEstandarizadoPanel.java` — endpoint `/api/v1/estandar`, columns: `Cod_Estandar`, `Nombre_Estandar`, `estReg`. No FK fields.
+- [ ] **8.6** `panel/ConstituyentePanel.java` — endpoint `/api/v1/constituyente`, columns: `Cod_Constituyente`, `Nombre_Constituyente`, `Otros_Datos`, `estReg`. No FK fields.
+- [ ] **8.7** `panel/RegionPanel.java` — endpoint `/api/v1/region`, columns: `ID_Region`, `Nombre_Region`, `estReg`. No FK fields.
+- [ ] **8.8** `panel/EmpresaProductoraPanel.java` — endpoint `/api/v1/productora`, columns: `NIF_Empresa`, `Nombre_Empresa`, `Ciudad_Empresa`, `Actividad`, `Otros_Datos`, `estReg`. No FK fields.
+- [ ] **8.9** `panel/EmpresaTransportistaPanel.java` — endpoint `/api/v1/transportista`, columns: `NIF_Transportista`, `Nombre_Transportista`, `Ciudad_Transportista`, `Otros_Datos`, `estReg`. No FK fields.
+- [ ] **8.10** `panel/DestinoPanel.java` — endpoint `/api/v1/destino`, FK field `ID_Region` rendered as a `ComboBox` populated from `GET /api/v1/region` (all records); label shows `Nombre_Region`.
+- [ ] **8.11** `panel/ResiduoPanel.java` — endpoint `/api/v1/residuo`, FK fields:
+  - `NIF_Empresa` → `ComboBox` from `GET /api/v1/productora`, label shows `Nombre_Empresa`.
+  - `Cod_Estandar` → `ComboBox` from `GET /api/v1/estandar`, label shows `Nombre_Estandar`.
+  - `ID_Toxicidad` → `ComboBox` from `GET /api/v1/toxicidad`, label shows `Nivel`.
+- [ ] **8.12** `panel/ResiduoConstituyentePanel.java` — endpoint `/api/v1/residuo-constituyente`, FK fields:
+  - `Cod_Residuo` → `ComboBox` from `GET /api/v1/residuo`, label shows `Cod_Residuo`.
+  - `Cod_Constituyente` (column name `ID_Constituyente` in table) → `ComboBox` from `GET /api/v1/constituyente`, label shows `Nombre_Constituyente`.
+- [ ] **8.13** `panel/TrasladoPanel.java` — endpoint `/api/v1/traslado`, FK fields:
+  - `Cod_Residuo` → `ComboBox` from `GET /api/v1/residuo`.
+  - `Cod_Destino` → `ComboBox` from `GET /api/v1/destino`, label shows `Nombre_Destino`.
+  - `ID_Envase` → `ComboBox` from `GET /api/v1/envase`, label shows `Nombre_Envase`.
+  - `ID_Tratamiento` → `ComboBox` from `GET /api/v1/tratamiento`, label shows `Nombre_Tratamiento`.
+- [ ] **8.14** `panel/TrasladoTransportistaPanel.java` — endpoint `/api/v1/traslado-transportista`, FK fields:
+  - `ID_Traslado` → `ComboBox` from `GET /api/v1/traslado`.
+  - `NIF_Transportista` → `ComboBox` from `GET /api/v1/transportista`, label shows `Nombre_Transportista`.
+  - `ID_Tipo_Transporte` → `ComboBox` from `GET /api/v1/transporte`, label shows `Nombre_Transporte`.
 
 ---
 
@@ -305,12 +334,13 @@ For each table, create a dedicated panel class extending or composing `MainWindo
 - [ ] **10.1** Run `docker compose up --build` and verify both containers start cleanly: DB initializes schema from `postresiduos.sql`, backend connects and health endpoint responds.
 
 - [ ] **10.2** Run the JavaFX client against the live stack and verify end-to-end for at least one reference table (e.g., `TR_Nivel_Toxicidad`):
-  - Add a record → appears in grid.
+  - Add a record → appears in grid with `estReg = 'A'` (active style).
   - Modify a record → grid refreshes with new values.
-  - Inactivate → record disappears from active grid.
-  - Reactivate → record reappears.
-  - Delete → record disappears and `estReg = '*'` in DB.
+  - Inactivate → record stays in grid, row style changes to muted/inactive.
+  - Reactivate → record row style returns to active.
+  - Delete → record stays in grid, row style changes to strikethrough/deleted; `estReg = '*'` confirmed in DB.
   - Cancel mid-operation → form clears, no DB change.
+  - FK ComboBox fields → populated with all records from the referenced table, correct label shown.
 
 - [ ] **10.3** Verify error scenarios:
   - Submit with blank required field → `400` returned, invalid fields highlighted (Req 7-4).
