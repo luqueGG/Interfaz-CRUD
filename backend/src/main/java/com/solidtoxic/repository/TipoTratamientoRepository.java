@@ -24,9 +24,15 @@ public class TipoTratamientoRepository {
             rs.getString("estReg")
     );
 
+    public List<TipoTratamiento> findAll() {
+        return jdbc.query(
+                "SELECT ID_Tratamiento, Nombre_Tratamiento, Descripcion, estReg FROM TR_Tipo_Tratamiento ORDER BY ID_Tratamiento",
+                rowMapper);
+    }
+
     public List<TipoTratamiento> findByState(String state) {
         return jdbc.query(
-                "SELECT ID_Tratamiento, Nombre_Tratamiento, Descripcion, estReg FROM TR_Tipo_Tratamiento WHERE estReg = ?",
+                "SELECT ID_Tratamiento, Nombre_Tratamiento, Descripcion, estReg FROM TR_Tipo_Tratamiento WHERE estReg = ? ORDER BY ID_Tratamiento",
                 rowMapper, state);
     }
 

@@ -25,10 +25,17 @@ public class EmpresaTransportistaRepository {
             rs.getString("estReg")
     );
 
+    public List<EmpresaTransportista> findAll() {
+        return jdbc.query(
+                "SELECT NIF_Transportista, Nombre_Transportista, Ciudad_Transportista, Otros_Datos, estReg " +
+                "FROM Empresa_Transportista ORDER BY NIF_Transportista",
+                rowMapper);
+    }
+
     public List<EmpresaTransportista> findByState(String state) {
         return jdbc.query(
                 "SELECT NIF_Transportista, Nombre_Transportista, Ciudad_Transportista, Otros_Datos, estReg " +
-                "FROM Empresa_Transportista WHERE estReg = ?",
+                "FROM Empresa_Transportista WHERE estReg = ? ORDER BY NIF_Transportista",
                 rowMapper, state);
     }
 

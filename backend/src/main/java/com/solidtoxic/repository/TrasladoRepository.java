@@ -32,10 +32,17 @@ public class TrasladoRepository {
         return t;
     };
 
+    public List<Traslado> findAll() {
+        return jdbc.query(
+                "SELECT ID_Traslado, Cod_Residuo, Cod_Destino, Fecha_Envio, Cantidad_Trasladada, " +
+                "ID_Envase, ID_Tratamiento, Fecha_Llegada, Otros_Datos, estReg FROM Traslado ORDER BY ID_Traslado",
+                rowMapper);
+    }
+
     public List<Traslado> findByState(String state) {
         return jdbc.query(
                 "SELECT ID_Traslado, Cod_Residuo, Cod_Destino, Fecha_Envio, Cantidad_Trasladada, " +
-                "ID_Envase, ID_Tratamiento, Fecha_Llegada, Otros_Datos, estReg FROM Traslado WHERE estReg = ?",
+                "ID_Envase, ID_Tratamiento, Fecha_Llegada, Otros_Datos, estReg FROM Traslado WHERE estReg = ? ORDER BY ID_Traslado",
                 rowMapper, state);
     }
 

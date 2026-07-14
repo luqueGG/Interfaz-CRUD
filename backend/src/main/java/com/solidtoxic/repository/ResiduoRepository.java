@@ -27,10 +27,17 @@ public class ResiduoRepository {
             rs.getString("estReg")
     );
 
+    public List<Residuo> findAll() {
+        return jdbc.query(
+                "SELECT Cod_Residuo, NIF_Empresa, Cod_Estandar, ID_Toxicidad, " +
+                "Cantidad_Total, Otros_Datos, estReg FROM Residuo ORDER BY Cod_Residuo",
+                rowMapper);
+    }
+
     public List<Residuo> findByState(String state) {
         return jdbc.query(
                 "SELECT Cod_Residuo, NIF_Empresa, Cod_Estandar, ID_Toxicidad, " +
-                "Cantidad_Total, Otros_Datos, estReg FROM Residuo WHERE estReg = ?",
+                "Cantidad_Total, Otros_Datos, estReg FROM Residuo WHERE estReg = ? ORDER BY Cod_Residuo",
                 rowMapper, state);
     }
 

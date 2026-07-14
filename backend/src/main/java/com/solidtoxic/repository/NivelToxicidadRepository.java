@@ -24,9 +24,15 @@ public class NivelToxicidadRepository {
             rs.getString("estReg")
     );
 
+    public List<NivelToxicidad> findAll() {
+        return jdbc.query(
+                "SELECT ID_Toxicidad, Nivel, Descripcion, estReg FROM TR_Nivel_Toxicidad ORDER BY ID_Toxicidad",
+                rowMapper);
+    }
+
     public List<NivelToxicidad> findByState(String state) {
         return jdbc.query(
-                "SELECT ID_Toxicidad, Nivel, Descripcion, estReg FROM TR_Nivel_Toxicidad WHERE estReg = ?",
+                "SELECT ID_Toxicidad, Nivel, Descripcion, estReg FROM TR_Nivel_Toxicidad WHERE estReg = ? ORDER BY ID_Toxicidad",
                 rowMapper, state);
     }
 

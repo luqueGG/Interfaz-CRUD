@@ -23,9 +23,15 @@ public class RegionRepository {
             rs.getString("estReg")
     );
 
+    public List<Region> findAll() {
+        return jdbc.query(
+                "SELECT ID_Region, Nombre_Region, estReg FROM Region ORDER BY ID_Region",
+                rowMapper);
+    }
+
     public List<Region> findByState(String state) {
         return jdbc.query(
-                "SELECT ID_Region, Nombre_Region, estReg FROM Region WHERE estReg = ?",
+                "SELECT ID_Region, Nombre_Region, estReg FROM Region WHERE estReg = ? ORDER BY ID_Region",
                 rowMapper, state);
     }
 

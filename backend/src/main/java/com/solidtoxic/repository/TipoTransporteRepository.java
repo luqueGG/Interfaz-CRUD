@@ -24,9 +24,15 @@ public class TipoTransporteRepository {
             rs.getString("estReg")
     );
 
+    public List<TipoTransporte> findAll() {
+        return jdbc.query(
+                "SELECT ID_Tipo_Transporte, Nombre_Transporte, Descripcion, estReg FROM TR_Tipo_Transporte ORDER BY ID_Tipo_Transporte",
+                rowMapper);
+    }
+
     public List<TipoTransporte> findByState(String state) {
         return jdbc.query(
-                "SELECT ID_Tipo_Transporte, Nombre_Transporte, Descripcion, estReg FROM TR_Tipo_Transporte WHERE estReg = ?",
+                "SELECT ID_Tipo_Transporte, Nombre_Transporte, Descripcion, estReg FROM TR_Tipo_Transporte WHERE estReg = ? ORDER BY ID_Tipo_Transporte",
                 rowMapper, state);
     }
 

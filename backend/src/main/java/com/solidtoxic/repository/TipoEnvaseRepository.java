@@ -24,9 +24,15 @@ public class TipoEnvaseRepository {
             rs.getString("estReg")
     );
 
+    public List<TipoEnvase> findAll() {
+        return jdbc.query(
+                "SELECT ID_Envase, Nombre_Envase, Descripcion, estReg FROM TR_Tipo_Envase ORDER BY ID_Envase",
+                rowMapper);
+    }
+
     public List<TipoEnvase> findByState(String state) {
         return jdbc.query(
-                "SELECT ID_Envase, Nombre_Envase, Descripcion, estReg FROM TR_Tipo_Envase WHERE estReg = ?",
+                "SELECT ID_Envase, Nombre_Envase, Descripcion, estReg FROM TR_Tipo_Envase WHERE estReg = ? ORDER BY ID_Envase",
                 rowMapper, state);
     }
 

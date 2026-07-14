@@ -28,10 +28,17 @@ public class DestinoRepository {
             rs.getString("estReg")
     );
 
+    public List<Destino> findAll() {
+        return jdbc.query(
+                "SELECT Cod_Destino, ID_Region, Nombre_Destino, Ciudad_Destino, " +
+                "Capacidad_Maxima, Capacidad_Actual, Otros_Datos, estReg FROM Destino ORDER BY Cod_Destino",
+                rowMapper);
+    }
+
     public List<Destino> findByState(String state) {
         return jdbc.query(
                 "SELECT Cod_Destino, ID_Region, Nombre_Destino, Ciudad_Destino, " +
-                "Capacidad_Maxima, Capacidad_Actual, Otros_Datos, estReg FROM Destino WHERE estReg = ?",
+                "Capacidad_Maxima, Capacidad_Actual, Otros_Datos, estReg FROM Destino WHERE estReg = ? ORDER BY Cod_Destino",
                 rowMapper, state);
     }
 

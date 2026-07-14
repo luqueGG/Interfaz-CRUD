@@ -26,10 +26,17 @@ public class EmpresaProductoraRepository {
             rs.getString("estReg")
     );
 
+    public List<EmpresaProductora> findAll() {
+        return jdbc.query(
+                "SELECT NIF_Empresa, Nombre_Empresa, Ciudad_Empresa, Actividad, Otros_Datos, estReg " +
+                "FROM Empresa_Productora ORDER BY NIF_Empresa",
+                rowMapper);
+    }
+
     public List<EmpresaProductora> findByState(String state) {
         return jdbc.query(
                 "SELECT NIF_Empresa, Nombre_Empresa, Ciudad_Empresa, Actividad, Otros_Datos, estReg " +
-                "FROM Empresa_Productora WHERE estReg = ?",
+                "FROM Empresa_Productora WHERE estReg = ? ORDER BY NIF_Empresa",
                 rowMapper, state);
     }
 

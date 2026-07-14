@@ -24,9 +24,15 @@ public class ConstituyenteRepository {
             rs.getString("estReg")
     );
 
+    public List<Constituyente> findAll() {
+        return jdbc.query(
+                "SELECT Cod_Constituyente, Nombre_Constituyente, Otros_Datos, estReg FROM Constituyente ORDER BY Cod_Constituyente",
+                rowMapper);
+    }
+
     public List<Constituyente> findByState(String state) {
         return jdbc.query(
-                "SELECT Cod_Constituyente, Nombre_Constituyente, Otros_Datos, estReg FROM Constituyente WHERE estReg = ?",
+                "SELECT Cod_Constituyente, Nombre_Constituyente, Otros_Datos, estReg FROM Constituyente WHERE estReg = ? ORDER BY Cod_Constituyente",
                 rowMapper, state);
     }
 

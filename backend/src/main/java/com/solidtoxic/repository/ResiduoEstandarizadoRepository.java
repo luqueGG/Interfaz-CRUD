@@ -23,9 +23,15 @@ public class ResiduoEstandarizadoRepository {
             rs.getString("estReg")
     );
 
+    public List<ResiduoEstandarizado> findAll() {
+        return jdbc.query(
+                "SELECT Cod_Estandar, Nombre_Estandar, estReg FROM Residuo_Estandarizado ORDER BY Cod_Estandar",
+                rowMapper);
+    }
+
     public List<ResiduoEstandarizado> findByState(String state) {
         return jdbc.query(
-                "SELECT Cod_Estandar, Nombre_Estandar, estReg FROM Residuo_Estandarizado WHERE estReg = ?",
+                "SELECT Cod_Estandar, Nombre_Estandar, estReg FROM Residuo_Estandarizado WHERE estReg = ? ORDER BY Cod_Estandar",
                 rowMapper, state);
     }
 
