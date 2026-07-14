@@ -1,12 +1,12 @@
 -- =====================================================================
 -- PROYECTO       : SolidToxic / RESSOL - Gestión de Residuos Sólidos
 -- ARCHIVO        : 02_vistas_triggers_procedimientos.sql
--- SGBD           : PostgreSQL 16 (según docker-compose.yml del repo)
+-- SGBD           : PostgreSQL 16 
 -- BASE DE DATOS  : solidtoxic
--- AUTOR(ES)      : << completar >>
--- FECHA CREACIÓN : << dd/mm/aaaa >>
--- ÚLTIMA MOD.    : << dd/mm/aaaa >>
--- REQUIERE       : db/postresiduos.sql ya ejecutado (tablas + datos semilla)
+-- AUTOR(ES)      : Jhon Cuyo
+-- FECHA CREACIÓN : 14/07/2026
+-- ÚLTIMA MOD.    : 14/07/2026
+-- REQUIERE       : db/postresiduos.sql ya ejecutado 
 -- NOTA           : Ningún objeto de este archivo hace INSERT/UPDATE/DELETE
 --                  sobre tablas de negocio (solo valida o consulta).
 -- =====================================================================
@@ -361,6 +361,3 @@ DROP ROLE IF EXISTS rol_auditor;
 CREATE ROLE rol_auditor NOLOGIN;
 GRANT SELECT ON v_reporte_traslados_completo, v_empresas_productoras TO rol_auditor;
 
--- =====================================================================
--- FIN
--- =====================================================================
