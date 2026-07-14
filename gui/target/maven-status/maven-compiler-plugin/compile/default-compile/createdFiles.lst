@@ -2,12 +2,15 @@ com\solidtoxic\gui\panel\ConstituyentePanel.class
 com\solidtoxic\gui\component\OperationMode.class
 com\solidtoxic\gui\panel\MaintenancePanel.class
 com\solidtoxic\gui\component\RegisterForm$FkComboBox.class
+com\solidtoxic\gui\report\ReportService$1.class
 com\solidtoxic\gui\component\FieldDescriptor.class
 com\solidtoxic\gui\client\ApiClient.class
 com\solidtoxic\gui\panel\RegionPanel.class
+com\solidtoxic\gui\report\ReportService.class
 com\solidtoxic\gui\panel\EmpresaTransportistaPanel.class
 com\solidtoxic\gui\panel\EmpresaProductoraPanel.class
 com\solidtoxic\gui\panel\TipoTratamientoPanel.class
+com\solidtoxic\gui\report\ReportService$ColumnDef.class
 com\solidtoxic\gui\util\AlertUtil.class
 com\solidtoxic\gui\component\RegisterForm.class
 com\solidtoxic\gui\panel\ResiduoConstituyentePanel.class

@@ -4,6 +4,8 @@ import com.solidtoxic.gui.client.ApiClient;
 import com.solidtoxic.gui.client.ApiResponse;
 import com.solidtoxic.gui.client.BackendUnavailableException;
 import com.solidtoxic.gui.panel.*;
+import com.solidtoxic.gui.report.ReportService;
+import com.solidtoxic.gui.report.ReportService.ColumnDef;
 import com.solidtoxic.gui.util.AlertUtil;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -11,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -22,6 +25,7 @@ public class MainWindow extends BorderPane {
 
     private final StackPane contentArea = new StackPane();
     private Node currentPanel = null;
+    private final ReportService reportService = new ReportService();
 
     // Ordered registry: menu label → panel factory
     private final Map<String, Supplier<Node>> panelRegistry = new LinkedHashMap<>();
@@ -66,6 +70,7 @@ public class MainWindow extends BorderPane {
         Menu refMenu    = new Menu("Reference Tables");
         Menu masterMenu = new Menu("Master Tables");
         Menu txMenu     = new Menu("Transactional");
+        Menu repMenu    = new Menu("Reportes");
 
         for (Map.Entry<String, Supplier<Node>> entry : panelRegistry.entrySet()) {
             MenuItem item = new MenuItem(entry.getKey());
@@ -82,8 +87,66 @@ public class MainWindow extends BorderPane {
                 refMenu.getItems().add(item);
             }
         }
-        bar.getMenus().addAll(refMenu, masterMenu, txMenu);
+
+        // ── Reportes ──────────────────────────────────────────────────────────
+        repMenu.getItems().addAll(
+                reportItem("Producer Companies",
+                        "/api/v1/productora",
+                        List.of(
+                                new ColumnDef("nifEmpresa",     "NIF Empresa"),
+                                new ColumnDef("nombreEmpresa",  "Nombre"),
+                                new ColumnDef("ciudadEmpresa",  "Ciudad"),
+                                new ColumnDef("actividad",      "Actividad"),
+                                new ColumnDef("otrosDatos",     "Otros Datos"),
+                                new ColumnDef("estReg",         "Estado")
+                        )),
+                reportItem("Transport Companies",
+                        "/api/v1/transportista",
+                        List.of(
+                                new ColumnDef("nifTransportista",    "NIF Transportista"),
+                                new ColumnDef("nombreTransportista", "Nombre"),
+                                new ColumnDef("ciudadTransportista", "Ciudad"),
+                                new ColumnDef("otrosDatos",          "Otros Datos"),
+                                new ColumnDef("estReg",              "Estado")
+                        )),
+                reportItem("Destinations",
+                        "/api/v1/destino",
+                        List.of(
+                                new ColumnDef("codDestino",       "Cod. Destino"),
+                                new ColumnDef("idRegion",         "ID Región"),
+                                new ColumnDef("nombreDestino",    "Nombre"),
+                                new ColumnDef("ciudadDestino",    "Ciudad"),
+                                new ColumnDef("capacidadMaxima",  "Cap. Máxima"),
+                                new ColumnDef("capacidadActual",  "Cap. Actual"),
+                                new ColumnDef("otrosDatos",       "Otros Datos"),
+                                new ColumnDef("estReg",           "Estado")
+                        )),
+                reportItem("Waste Records",
+                        "/api/v1/residuo",
+                        List.of(
+                                new ColumnDef("codResiduo",     "Cod. Residuo"),
+                                new ColumnDef("nifEmpresa",     "NIF Empresa"),
+                                new ColumnDef("codEstandar",    "Cod. Estándar"),
+                                new ColumnDef("idToxicidad",    "ID Toxicidad"),
+                                new ColumnDef("cantidadTotal",  "Cantidad Total"),
+                                new ColumnDef("otrosDatos",     "Otros Datos"),
+                                new ColumnDef("estReg",         "Estado")
+                        ))
+        );
+
+        bar.getMenus().addAll(refMenu, masterMenu, txMenu, repMenu);
         return bar;
+    }
+
+    /** Builds a MenuItem that triggers a PDF export for the given endpoint and columns. */
+    private MenuItem reportItem(String label, String apiPath, List<ColumnDef> columns) {
+        MenuItem item = new MenuItem(label + "…");
+        item.setOnAction(e -> reportService.exportToPdf(
+                getScene().getWindow(),
+                label,
+                apiPath,
+                columns));
+        return item;
     }
 
     // ── Layout ────────────────────────────────────────────────────────────────
