@@ -31,6 +31,10 @@ public class ResiduoService {
         this.toxicidadRepo = toxicidadRepo;
     }
 
+    public List<Residuo> getAll() {
+        return repo.findAll();
+    }
+
     public List<Residuo> getByState(String state) {
         return repo.findByState(state);
     }

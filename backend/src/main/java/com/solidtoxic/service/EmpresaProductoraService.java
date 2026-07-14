@@ -19,6 +19,10 @@ public class EmpresaProductoraService {
         this.repo = repo;
     }
 
+    public List<EmpresaProductora> getAll() {
+        return repo.findAll();
+    }
+
     public List<EmpresaProductora> getByState(String state) {
         return repo.findByState(state);
     }

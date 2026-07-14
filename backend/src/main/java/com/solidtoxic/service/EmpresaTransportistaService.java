@@ -19,6 +19,10 @@ public class EmpresaTransportistaService {
         this.repo = repo;
     }
 
+    public List<EmpresaTransportista> getAll() {
+        return repo.findAll();
+    }
+
     public List<EmpresaTransportista> getByState(String state) {
         return repo.findByState(state);
     }

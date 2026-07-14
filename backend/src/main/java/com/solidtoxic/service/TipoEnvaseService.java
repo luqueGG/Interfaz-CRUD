@@ -19,6 +19,10 @@ public class TipoEnvaseService {
         this.repo = repo;
     }
 
+    public List<TipoEnvase> getAll() {
+        return repo.findAll();
+    }
+
     public List<TipoEnvase> getByState(String state) {
         return repo.findByState(state);
     }

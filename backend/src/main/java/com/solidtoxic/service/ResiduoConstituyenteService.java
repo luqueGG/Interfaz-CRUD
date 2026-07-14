@@ -27,6 +27,10 @@ public class ResiduoConstituyenteService {
         this.constituyenteRepo = constituyenteRepo;
     }
 
+    public List<ResiduoConstituyente> getAll() {
+        return repo.findAll();
+    }
+
     public List<ResiduoConstituyente> getByState(String state) {
         return repo.findByState(state);
     }

@@ -19,6 +19,10 @@ public class RegionService {
         this.repo = repo;
     }
 
+    public List<Region> getAll() {
+        return repo.findAll();
+    }
+
     public List<Region> getByState(String state) {
         return repo.findByState(state);
     }

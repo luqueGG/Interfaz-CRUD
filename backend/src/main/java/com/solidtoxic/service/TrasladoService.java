@@ -32,6 +32,10 @@ public class TrasladoService {
         this.tratamientoRepo = tratamientoRepo;
     }
 
+    public List<Traslado> getAll() {
+        return repo.findAll();
+    }
+
     public List<Traslado> getByState(String state) {
         return repo.findByState(state);
     }

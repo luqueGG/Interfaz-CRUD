@@ -19,6 +19,10 @@ public class ResiduoEstandarizadoService {
         this.repo = repo;
     }
 
+    public List<ResiduoEstandarizado> getAll() {
+        return repo.findAll();
+    }
+
     public List<ResiduoEstandarizado> getByState(String state) {
         return repo.findByState(state);
     }

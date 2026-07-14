@@ -31,6 +31,10 @@ public class TrasladoTransportistaService {
         this.tipoTransporteRepo = tipoTransporteRepo;
     }
 
+    public List<TrasladoTransportista> getAll() {
+        return repo.findAll();
+    }
+
     public List<TrasladoTransportista> getByState(String state) {
         return repo.findByState(state);
     }

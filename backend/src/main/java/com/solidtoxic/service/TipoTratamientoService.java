@@ -19,6 +19,10 @@ public class TipoTratamientoService {
         this.repo = repo;
     }
 
+    public List<TipoTratamiento> getAll() {
+        return repo.findAll();
+    }
+
     public List<TipoTratamiento> getByState(String state) {
         return repo.findByState(state);
     }

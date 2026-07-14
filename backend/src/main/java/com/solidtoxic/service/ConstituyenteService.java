@@ -19,6 +19,10 @@ public class ConstituyenteService {
         this.repo = repo;
     }
 
+    public List<Constituyente> getAll() {
+        return repo.findAll();
+    }
+
     public List<Constituyente> getByState(String state) {
         return repo.findByState(state);
     }

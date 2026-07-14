@@ -19,6 +19,10 @@ public class NivelToxicidadService {
         this.repo = repo;
     }
 
+    public List<NivelToxicidad> getAll() {
+        return repo.findAll();
+    }
+
     public List<NivelToxicidad> getByState(String state) {
         return repo.findByState(state);
     }

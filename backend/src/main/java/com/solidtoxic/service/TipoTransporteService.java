@@ -19,6 +19,10 @@ public class TipoTransporteService {
         this.repo = repo;
     }
 
+    public List<TipoTransporte> getAll() {
+        return repo.findAll();
+    }
+
     public List<TipoTransporte> getByState(String state) {
         return repo.findByState(state);
     }
