@@ -27,7 +27,7 @@ forma automatica
 
 ## Features
 
-## Instrucciones para Windows (para MAC no se xd, prueba)
+## Instrucciones para Windows
 
 Clona el repositorio (via HTTPS)
 ```
